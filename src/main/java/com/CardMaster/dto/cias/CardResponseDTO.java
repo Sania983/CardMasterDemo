@@ -1,4 +1,4 @@
-package com.CardMaster.dto;
+package com.CardMaster.dto.cias;
 
 import lombok.Data;
 

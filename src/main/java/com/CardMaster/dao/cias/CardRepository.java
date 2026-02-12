@@ -1,6 +1,6 @@
-package com.CardMaster.dao;
+package com.CardMaster.dao.cias;
 
-import com.CardMaster.model.Card;
+import com.CardMaster.model.cias.Card;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

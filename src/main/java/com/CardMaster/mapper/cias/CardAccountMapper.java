@@ -1,10 +1,10 @@
 
-package com.CardMaster.mapper;
+package com.CardMaster.mapper.cias;
 
-import com.CardMaster.dto.CardAccountRequestDTO;
-import com.CardMaster.dto.CardAccountResponseDTO;
-import com.CardMaster.dto.CardAccountResponseDTO;
-import com.CardMaster.model.CardAccount;
+import com.CardMaster.dto.cias.CardAccountRequestDTO;
+import com.CardMaster.dto.cias.CardAccountResponseDTO;
+
+import com.CardMaster.model.cias.CardAccount;
 
 public class CardAccountMapper {
 

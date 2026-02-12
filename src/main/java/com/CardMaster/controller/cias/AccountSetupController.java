@@ -1,7 +1,7 @@
-package com.CardMaster.controller;
+package com.CardMaster.controller.cias;
 
-import com.CardMaster.model.CardAccount;
-import com.CardMaster.service.AccountSetupService;
+import com.CardMaster.model.cias.CardAccount;
+import com.CardMaster.service.cias.AccountSetupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

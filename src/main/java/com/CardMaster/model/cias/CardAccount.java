@@ -1,4 +1,4 @@
-package com.CardMaster.model;
+package com.CardMaster.model.cias;
 
 import jakarta.persistence.*;
 import lombok.Data;

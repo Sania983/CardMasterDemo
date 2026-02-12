@@ -1,7 +1,7 @@
-package com.CardMaster.service;
+package com.CardMaster.service.cias;
 
-import com.CardMaster.model.CardAccount;
-import com.CardMaster.dao.CardAccountRepository;
+import com.CardMaster.model.cias.CardAccount;
+import com.CardMaster.dao.cias.CardAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
