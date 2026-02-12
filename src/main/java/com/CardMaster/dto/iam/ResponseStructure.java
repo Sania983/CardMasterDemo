@@ -1,4 +1,4 @@
-package com.CardMaster.dto;
+package com.CardMaster.dto.iam;
 
 public class ResponseStructure<T> {
     private String msg;

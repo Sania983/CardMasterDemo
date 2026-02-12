@@ -1,4 +1,4 @@
-package main.java.com.CardMaster.model.iam;
+package com.CardMaster.model.iam;
 
 import jakarta.persistence.*;
 import lombok.Data;

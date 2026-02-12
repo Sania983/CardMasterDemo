@@ -1,5 +1,5 @@
-package com.CardMaster.model;
-import com.CardMaster.Enum.UserEnum;
+package com.CardMaster.model.iam;
+import com.CardMaster.Enum.iam.UserEnum;
 import jakarta.persistence.*;
 import lombok.Data;
 

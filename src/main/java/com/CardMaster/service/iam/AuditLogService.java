@@ -1,7 +1,7 @@
-package com.CardMaster.service;
+package com.CardMaster.service.iam;
 
-import com.CardMaster.dao.AuditLogRepository;
-import com.CardMaster.model.AuditLog;
+import com.CardMaster.dao.iam.AuditLogRepository;
+import com.CardMaster.model.iam.AuditLog;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

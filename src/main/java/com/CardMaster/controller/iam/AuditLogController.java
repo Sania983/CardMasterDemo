@@ -1,8 +1,8 @@
-package com.CardMaster.controller;
+package com.CardMaster.controller.iam;
 
-import com.CardMaster.dto.ResponseStructure;
-import com.CardMaster.model.AuditLog;
-import com.CardMaster.service.AuditLogService;
+import com.CardMaster.dto.iam.ResponseStructure;
+import com.CardMaster.model.iam.AuditLog;
+import com.CardMaster.service.iam.AuditLogService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

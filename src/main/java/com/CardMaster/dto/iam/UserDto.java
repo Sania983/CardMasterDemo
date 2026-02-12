@@ -1,6 +1,6 @@
-package com.CardMaster.dto;
+package com.CardMaster.dto.iam;
 
-import com.CardMaster.Enum.UserEnum;
+import com.CardMaster.Enum.iam.UserEnum;
 
 public class UserDto {
     private Long userId;

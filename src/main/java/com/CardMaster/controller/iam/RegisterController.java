@@ -1,10 +1,10 @@
-package com.CardMaster.controller;
+package com.CardMaster.controller.iam;
 
-import com.CardMaster.model.User;
-import com.CardMaster.service.UserService;
-import com.CardMaster.dto.ResponseStructure;
-import com.CardMaster.dto.UserDto;
-import com.CardMaster.dto.UserMapper;
+import com.CardMaster.model.iam.User;
+import com.CardMaster.service.iam.UserService;
+import com.CardMaster.dto.iam.ResponseStructure;
+import com.CardMaster.dto.iam.UserDto;
+import com.CardMaster.mapper.iam.UserMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;

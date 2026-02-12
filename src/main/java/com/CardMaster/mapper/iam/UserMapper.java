@@ -1,6 +1,7 @@
-package com.CardMaster.dto;
+package com.CardMaster.mapper.iam;
 
-import com.CardMaster.model.User;
+import com.CardMaster.model.iam.User;
+import com.CardMaster.dto.iam.UserDto;
 import org.springframework.stereotype.Component;
 
 @Component
