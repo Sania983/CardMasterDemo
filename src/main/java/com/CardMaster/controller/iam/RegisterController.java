@@ -29,7 +29,7 @@ public class RegisterController {
     @GetMapping
     public ResponseEntity<ResponseStructure<List<UserDto>>> getAllUsers() {
         log.info("Inside getAllUsers Controller");
-        List<UserDto> users = userService.getAllUser()
+        List<UserDto> users = userService.getAllUsers()
                 .stream()
                 .map(UserMapper::toDto)
                 .collect(Collectors.toList());
@@ -44,7 +44,7 @@ public class RegisterController {
     @GetMapping("/{userId}")
     public ResponseEntity<ResponseStructure<UserDto>> getUserById(@PathVariable Long userId) {
         log.info("Inside getUserById Controller");
-        User user = userService.getById(userId);
+        User user = userService.getUserById(userId);
 
         ResponseStructure<UserDto> res = new ResponseStructure<>();
         if (user != null) {
@@ -73,7 +73,7 @@ public class RegisterController {
     // POST login
     @PostMapping("/login")
     public ResponseEntity<ResponseStructure<String>> login(@RequestBody User userd) {
-        User user = userService.loginUserByUserId(userd.getUserId(), userd.getName());
+        User user = userService.loginUser(userd.getUserId(), userd.getName());
 
         ResponseStructure<String> r = new ResponseStructure<>();
         if (user != null) {
@@ -85,5 +85,15 @@ public class RegisterController {
             r.setData(null);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(r);
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ResponseStructure<String>> logout(@RequestBody User userd) {
+        log.info("Inside logout Controller");
+        userService.logoutUser(userd.getUserId());
+        ResponseStructure<String> r = new ResponseStructure<>();
+        r.setMsg("Logout Successful");
+        r.setData("Goodbye " + userd.getName());
+        return ResponseEntity.status(HttpStatus.OK).body(r);
     }
 }
