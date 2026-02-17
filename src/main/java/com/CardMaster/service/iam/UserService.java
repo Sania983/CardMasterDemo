@@ -1,7 +1,7 @@
 package com.CardMaster.service.iam;
 
 import com.CardMaster.dao.iam.AuditLogRepository;
-import com.CardMaster.dao.iam.UserRepository;
+import com.CardMaster.dao.iam.UserRepository1;
 import com.CardMaster.exception.iam.InvalidCredentialsException;
 import com.CardMaster.exception.iam.UserNotFoundException;
 import com.CardMaster.model.iam.AuditLog;
@@ -13,10 +13,10 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepository1 userRepository;
     private final AuditLogRepository auditLogRepository;
 
-    public UserService(UserRepository userRepository, AuditLogRepository auditLogRepository) {
+    public UserService(UserRepository1 userRepository, AuditLogRepository auditLogRepository) {
         this.userRepository = userRepository;
         this.auditLogRepository = auditLogRepository;
     }
