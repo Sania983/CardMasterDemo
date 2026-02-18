@@ -2,13 +2,14 @@ package com.CardMaster.exception.iam;
 
 
 import com.CardMaster.dto.iam.ResponseStructure;
+import com.CardMaster.exception.iam.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
-public class GlobalExceptionHandler {
+@RestControllerAdvice(basePackages = "com.CardMaster.controller.iam")
+public class GlobalExceptionHandleriam {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ResponseStructure<String>> handleUserNotFound(UserNotFoundException ex) {

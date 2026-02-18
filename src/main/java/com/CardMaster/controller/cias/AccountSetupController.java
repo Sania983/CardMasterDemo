@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/accounts")
-public class AccountSetupController {
+public class  AccountSetupController {
 
     @Autowired
     private AccountSetupService accountSetupService;

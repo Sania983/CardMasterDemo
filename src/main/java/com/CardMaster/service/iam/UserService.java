@@ -13,22 +13,30 @@ import java.util.List;
 @Service
 public class UserService {
 
+<<<<<<< HEAD
+    private final UserRepository1 userRepository1;
+    private final AuditLogRepository auditLogRepository;
+
+    public UserService(UserRepository1 userRepository1, AuditLogRepository auditLogRepository) {
+        this.userRepository1 = userRepository1;
+=======
     private final UserRepository1 userRepository;
     private final AuditLogRepository auditLogRepository;
 
     public UserService(UserRepository1 userRepository, AuditLogRepository auditLogRepository) {
         this.userRepository = userRepository;
+>>>>>>> a00d10876ff491ab6fcb306786044d10ea80011d
         this.auditLogRepository = auditLogRepository;
     }
 
     // Get all users
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userRepository1.findAll();
     }
 
     // Get user by ID
     public User getUserById(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
+        User user = userRepository1.findById(userId).orElse(null);
         if (user == null) {
             throw new UserNotFoundException(userId);
         }
@@ -37,14 +45,14 @@ public class UserService {
 
     // Register new user
     public User registerUser(User user) {
-        User savedUser = userRepository.save(user);
+        User savedUser = userRepository1.save(user);
         logAction(savedUser, "REGISTER", "User Registration");
         return savedUser;
     }
 
     // Login user by ID and password
     public User loginUser(Long userId, String name) {
-        User user = userRepository.findById(userId).orElse(null);
+        User user = userRepository1.findById(userId).orElse(null);
         if (user == null) {
             throw new UserNotFoundException(userId);
         }
@@ -60,7 +68,7 @@ public class UserService {
 
     // Logout user
     public void logoutUser(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
+        User user = userRepository1.findById(userId).orElse(null);
         if (user == null) {
             throw new UserNotFoundException(userId);
         }

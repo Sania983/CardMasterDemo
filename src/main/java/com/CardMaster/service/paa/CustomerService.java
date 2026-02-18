@@ -1,6 +1,7 @@
 package com.CardMaster.service.paa;
 import com.CardMaster.dao.paa.CustomerRepository;
 import com.CardMaster.dto.paa.CustomerDto;
+import com.CardMaster.exceptions.paa.CustomerNotFoundException;
 import com.CardMaster.mapper.paa.EntityMapper;
 import com.CardMaster.model.paa.Customer;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ public class CustomerService {
     private final CustomerRepository repo;
 
     public CustomerService(CustomerRepository repo) {
+
         this.repo = repo;
     }
 
@@ -21,7 +23,8 @@ public class CustomerService {
     }
 
     public CustomerDto getCustomer(Long id) {
-        return repo.findById(id).map(EntityMapper::toCustomerDto).orElse(null);
+
+        return repo.findById(id).map(EntityMapper::toCustomerDto).orElseThrow(() -> new CustomerNotFoundException(id));
     }
 
     public CustomerDto updateCustomer(Long id, CustomerDto dto) {
