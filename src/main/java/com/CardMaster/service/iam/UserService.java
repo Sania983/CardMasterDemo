@@ -6,6 +6,7 @@ import com.CardMaster.exception.iam.InvalidCredentialsException;
 import com.CardMaster.exception.iam.UserNotFoundException;
 import com.CardMaster.model.iam.AuditLog;
 import com.CardMaster.model.iam.User;
+import com.CardMaster.security.iam.JwtUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class UserService {
 
     private final UserRepository1 userRepository;
     private final AuditLogRepository auditLogRepository;
-
+    private JwtUtil jwtUtil;
     public UserService(UserRepository1 userRepository, AuditLogRepository auditLogRepository) {
         this.userRepository = userRepository;
         this.auditLogRepository = auditLogRepository;
@@ -43,20 +44,20 @@ public class UserService {
     }
 
     // Login user by ID and password
-    public User loginUser(Long userId, String name) {
+    public String loginUser(Long userId, String name) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             throw new UserNotFoundException(userId);
         }
-
         if (!user.getName().equals(name)) {
             logAction(user, "LOGIN_FAILED", "Invalid credentials");
             throw new InvalidCredentialsException();
         }
-
         logAction(user, "LOGIN", "User Login");
-        return user;
+
+        return jwtUtil.generateToken(user.getName());
     }
+
 
     // Logout user
     public void logoutUser(Long userId) {

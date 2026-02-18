@@ -1,10 +1,12 @@
 package com.CardMaster.controller.iam;
 
 import com.CardMaster.model.iam.User;
+import com.CardMaster.security.iam.JwtUtil;
 import com.CardMaster.service.iam.UserService;
 import com.CardMaster.dto.iam.ResponseStructure;
 import com.CardMaster.dto.iam.UserDto;
 import com.CardMaster.mapper.iam.UserMapper;
+import com.CardMaster.service.iam.AuditLogService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -19,10 +21,16 @@ import java.util.stream.Collectors;
 public class RegisterController {
 
     private static final Logger log = LogManager.getLogger(RegisterController.class);
-    private final UserService userService;
 
-    public RegisterController(UserService userService) {
+    private final UserService userService;
+    private final JwtUtil jwtUtil;
+    private final AuditLogService auditLogService;
+
+    // ✅ Constructor injection for all dependencies
+    public RegisterController(UserService userService, JwtUtil jwtUtil, AuditLogService auditLogService) {
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
+        this.auditLogService = auditLogService;
     }
 
     // GET all users
@@ -73,27 +81,23 @@ public class RegisterController {
     // POST login
     @PostMapping("/login")
     public ResponseEntity<ResponseStructure<String>> login(@RequestBody User userd) {
-        User user = userService.loginUser(userd.getUserId(), userd.getName());
-
+        // ✅ Use password for login, not name
+        String token = userService.loginUser(userd.getUserId(), userd.getName());
         ResponseStructure<String> r = new ResponseStructure<>();
-        if (user != null) {
-            r.setMsg("Login Successful");
-            r.setData("Welcome " + user.getName());
-            return ResponseEntity.status(HttpStatus.OK).body(r);
-        } else {
-            r.setMsg("Invalid Credentials");
-            r.setData(null);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(r);
-        }
+        r.setMsg("Login Successful");
+        r.setData("Bearer " + token);
+        return ResponseEntity.status(HttpStatus.OK).body(r);
     }
 
+    // POST logout
     @PostMapping("/logout")
-    public ResponseEntity<ResponseStructure<String>> logout(@RequestBody User userd) {
-        log.info("Inside logout Controller");
-        userService.logoutUser(userd.getUserId());
+    public ResponseEntity<ResponseStructure<String>> logout(@RequestHeader("Authorization") String token) {
+        String username = jwtUtil.extractUsername(token.substring(7));
+        auditLogService.log(username, "LOGOUT", "User Logout");
+
         ResponseStructure<String> r = new ResponseStructure<>();
         r.setMsg("Logout Successful");
-        r.setData("Goodbye " + userd.getName());
+        r.setData("Goodbye " + username);
         return ResponseEntity.status(HttpStatus.OK).body(r);
     }
 }

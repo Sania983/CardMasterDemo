@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandleriam {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ResponseStructure<String>> handleUserNotFound(UserNotFoundException ex) {
