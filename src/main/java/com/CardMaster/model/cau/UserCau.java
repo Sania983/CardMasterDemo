@@ -1,5 +1,6 @@
 package com.CardMaster.model.cau;
 
+import com.CardMaster.model.iam.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "underwriter")
-public class UserCau {
+public class UserCau extends User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "underwriter_id")
