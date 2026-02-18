@@ -3,6 +3,8 @@ package com.CardMaster.service.paa;
 import com.CardMaster.dao.paa.CardApplicationRepository;
 import com.CardMaster.dao.paa.DocumentRepository;
 import com.CardMaster.dto.paa.DocumentDto;
+import com.CardMaster.exceptions.paa.ApplicationNotFoundException;
+import com.CardMaster.exceptions.paa.DocumentNotFoundException;
 import com.CardMaster.mapper.paa.EntityMapper;
 import com.CardMaster.model.paa.CardApplication;
 import com.CardMaster.model.paa.Document;
@@ -21,13 +23,16 @@ public class DocumentService {
     }
 
     public DocumentDto uploadDocument(DocumentDto dto) {
-        CardApplication app = appRepo.findById(dto.getApplicationId()).orElseThrow();
+        CardApplication app = appRepo.findById(dto.getApplicationId())
+                .orElseThrow(() -> new ApplicationNotFoundException(dto.getApplicationId()));
         Document doc = EntityMapper.toDocumentEntity(dto, app);
         return EntityMapper.toDocumentDto(repo.save(doc));
     }
 
     public DocumentDto getDocument(Long id) {
-        return repo.findById(id).map(EntityMapper::toDocumentDto).orElse(null);
+        return repo.findById(id)
+                .map(EntityMapper::toDocumentDto)
+                .orElseThrow(() -> new DocumentNotFoundException(id));
     }
 
     public List<DocumentDto> getDocumentsByApplication(Long appId) {
@@ -36,8 +41,13 @@ public class DocumentService {
     }
 
     public DocumentDto updateDocumentStatus(Long id, String status) {
-        Document doc = repo.findById(id).orElseThrow();
-        doc.setStatus(Document.DocumentStatus.valueOf(status));
+        Document doc = repo.findById(id)
+                .orElseThrow(() -> new DocumentNotFoundException(id));
+        try {
+            doc.setStatus(Document.DocumentStatus.valueOf(status));
+        } catch (IllegalArgumentException e) {
+            throw new DocumentNotFoundException("Invalid status value: " + status);
+        }
         return EntityMapper.toDocumentDto(repo.save(doc));
     }
 }

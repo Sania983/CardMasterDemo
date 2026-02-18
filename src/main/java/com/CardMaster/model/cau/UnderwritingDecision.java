@@ -1,31 +1,31 @@
-
 package com.CardMaster.model.cau;
 
-import com.CardMaster.Enum.cau.UnderwritingDecisionType;
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.time.LocalDateTime;
+import com.CardMaster.model.paa.CardApplication;
+import com.CardMaster.Enum.cau.UnderwritingDecisionType;
 
-@Entity
 @Data
+@Entity
+@Table(name = "underwriting_decision")
 public class UnderwritingDecision {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long decisionId;
 
-    // PDF: ApplicationID → relationship to CardApplication
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "application_id", nullable = false)
-    private CardApplication application;  // ApplicationID
-    // PDF: UnderwriterID → relationship to User
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private CardApplication application;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "underwriter_id", nullable = false)
-    private User underwriter;             // UnderwriterID
+    private UserCau underwriter;
+
     @Enumerated(EnumType.STRING)
-    private UnderwritingDecisionType decision; // Approve/Reject/Conditional
-    private Double approvedLimit;         // ApprovedLimit
-    private String remarks;               // Remarks
-    private LocalDateTime decisionDate;   // DecisionDate
+    private UnderwritingDecisionType decision;
+
+    private Double approvedLimit;
+    private String remarks;
+    private LocalDateTime decisionDate;
 }
