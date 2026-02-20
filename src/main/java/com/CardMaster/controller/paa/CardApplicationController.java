@@ -21,36 +21,47 @@ public class CardApplicationController {
     private static final Logger log = LogManager.getLogger(CardApplicationController.class);
     private final CardApplicationService applicationService;
 
-    // --- Submit Application ---
+    // --- Create Application ---
     @PostMapping
-    public ResponseEntity<ResponseStructure<CardApplicationDto>> submit(@Valid @RequestBody CardApplicationDto dto) {
-        log.info("Submitting card application");
-        CardApplicationDto saved = applicationService.submit(dto);
+    public ResponseEntity<ResponseStructure<CardApplicationDto>> create(
+            @Valid @RequestBody CardApplicationDto dto,
+            @RequestHeader("Authorization") String token) {
+
+        log.info("Creating card application");
+        CardApplicationDto saved = applicationService.create(dto, token);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ResponseStructure<>("Application submitted successfully", saved));
+                .body(new ResponseStructure<>("Application created successfully", saved));
     }
 
     // --- Get Application by ID ---
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseStructure<CardApplicationDto>> getById(@PathVariable Long id) {
+    public ResponseEntity<ResponseStructure<CardApplicationDto>> getById(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String token) {
+
         log.info("Fetching application {}", id);
-        CardApplicationDto dto = applicationService.findById(id);
+        CardApplicationDto dto = applicationService.findById(id, token);
         return ResponseEntity.ok(new ResponseStructure<>("Application retrieved successfully", dto));
     }
 
     // --- Get All Applications ---
     @GetMapping
-    public ResponseEntity<ResponseStructure<List<CardApplicationDto>>> getAllApplications() {
+    public ResponseEntity<ResponseStructure<List<CardApplicationDto>>> getAllApplications(
+            @RequestHeader("Authorization") String token) {
+
         log.info("Fetching all applications");
-        List<CardApplicationDto> apps = applicationService.getAllApplications();
+        List<CardApplicationDto> apps = applicationService.getAllApplications(token);
         return ResponseEntity.ok(new ResponseStructure<>("All applications retrieved successfully", apps));
     }
 
     // --- Delete Application ---
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseStructure<Void>> deleteApplication(@PathVariable Long id) {
+    public ResponseEntity<ResponseStructure<Void>> deleteApplication(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String token) {
+
         log.info("Deleting application {}", id);
-        applicationService.deleteApplication(id);
+        applicationService.deleteApplication(id, token);
         return ResponseEntity.ok(new ResponseStructure<>("Application deleted successfully", null));
     }
 }

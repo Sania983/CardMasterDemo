@@ -1,46 +1,81 @@
 package com.CardMaster.service.paa;
+
+import com.CardMaster.dao.paa.CustomerRepository;
 import com.CardMaster.dto.paa.CustomerDto;
 import com.CardMaster.exception.paa.CustomerNotFoundException;
 import com.CardMaster.mapper.paa.EntityMapper;
 import com.CardMaster.model.paa.Customer;
+import com.CardMaster.security.iam.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.ArrayList;
 
 @Service
+@RequiredArgsConstructor
 public class CustomerService {
-    private final CustomerRepository repo;
 
-    public CustomerService(CustomerRepository repo) {
+    private final CustomerRepository customerRepository;
+    private final JwtUtil jwtUtil;
 
-        this.repo = repo;
-    }
+    // --- Create Customer ---
+    public CustomerDto createCustomer(CustomerDto dto, String token) {
+        String username = jwtUtil.extractUsername(token.substring(7));
+        // Optionally enforce role-based rules (e.g., only OFFICER can create customers)
+        // jwtUtil.validateRole(token, "OFFICER");
 
-    public CustomerDto createCustomer(CustomerDto dto) {
         Customer entity = EntityMapper.toCustomerEntity(dto);
-        return EntityMapper.toCustomerDto(repo.save(entity));
+        Customer saved = customerRepository.save(entity);
+        return EntityMapper.toCustomerDto(saved);
     }
 
-    public CustomerDto getCustomer(Long id) {
+    // --- Get Customer by ID ---
+    public CustomerDto getCustomer(Long id, String token) {
+        jwtUtil.extractUsername(token.substring(7)); // validate token
 
-        return repo.findById(id).map(EntityMapper::toCustomerDto).orElseThrow(() -> new CustomerNotFoundException(id));
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
+        return EntityMapper.toCustomerDto(customer);
     }
 
-    public CustomerDto updateCustomer(Long id, CustomerDto dto) {
-        Customer existing = repo.findById(id).orElseThrow();
+    // --- Update Customer ---
+    public CustomerDto updateCustomer(Long id, CustomerDto dto, String token) {
+        jwtUtil.extractUsername(token.substring(7)); // validate token
+
+        Customer existing = customerRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
+
         existing.setName(dto.getName());
+        existing.setDob(java.time.LocalDate.parse(dto.getDob()));
         existing.setContactInfo(dto.getContactInfo());
         existing.setIncome(dto.getIncome());
         existing.setEmploymentType(Customer.EmploymentType.valueOf(dto.getEmploymentType()));
         existing.setStatus(Customer.CustomerStatus.valueOf(dto.getStatus()));
-        return EntityMapper.toCustomerDto(repo.save(existing));
+
+        Customer updated = customerRepository.save(existing);
+        return EntityMapper.toCustomerDto(updated);
     }
 
-    public void deleteCustomer(Long id) {
-        repo.deleteById(id);
+    // --- Delete Customer ---
+    public void deleteCustomer(Long id, String token) {
+        jwtUtil.extractUsername(token.substring(7)); // validate token
+
+        if (!customerRepository.existsById(id)) {
+            throw new CustomerNotFoundException("Customer not found with id: " + id);
+        }
+        customerRepository.deleteById(id);
     }
 
-    public List<CustomerDto> getAllCustomers() {
-        return repo.findAll().stream().map(EntityMapper::toCustomerDto).toList();
+    // --- Get All Customers ---
+    public List<CustomerDto> getAllCustomers(String token) {
+        jwtUtil.extractUsername(token.substring(7)); // validate token
+
+        List<Customer> customers = customerRepository.findAll();
+        List<CustomerDto> dtos = new ArrayList<>();
+        for (Customer customer : customers) {
+            dtos.add(EntityMapper.toCustomerDto(customer));
+        }
+        return dtos;
     }
 }
