@@ -1,4 +1,4 @@
-package com.CardMaster.exception.iam;
+package com.CardMaster.exceptions.iam;
 
 
 public class UserNotFoundException extends RuntimeException {

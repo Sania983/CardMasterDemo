@@ -3,7 +3,7 @@ package com.CardMaster.service.cpl;
 import com.CardMaster.model.cpl.CardProduct;
 import com.CardMaster.model.cpl.FeeConfig;
 import com.CardMaster.Enum.cpl.FeeType;
-import com.CardMaster.exception.cpl.NotFoundException;
+import com.CardMaster.exceptions.cpl.NotFoundException;
 import com.CardMaster.mapper.cpl.CardProductMapper;
 import com.CardMaster.mapper.cpl.FeeConfigMapper;
 import com.CardMaster.dao.cpl.CardProductRepository;

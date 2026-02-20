@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "underwriter")
-public class UserCau extends User {
+public class UserCau {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "underwriter_id")

@@ -6,9 +6,10 @@ import com.CardMaster.dto.cpl.request.CardProductUpdateRequest;
 import com.CardMaster.dto.cpl.response.CardProductResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-
+//@Component
 @Mapper(componentModel = "spring")
 public interface CardProductMapper {
 

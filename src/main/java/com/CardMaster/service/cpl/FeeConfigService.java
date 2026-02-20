@@ -5,7 +5,7 @@ import com.CardMaster.model.cpl.FeeConfig;
 import com.CardMaster.mapper.cpl.FeeConfigMapper;
 import com.CardMaster.dao.cpl.FeeConfigRepository;
 import com.CardMaster.dto.cpl.response.FeeConfigResponse;
-import com.CardMaster.exception.cpl.NotFoundException;
+import com.CardMaster.exceptions.cpl.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
