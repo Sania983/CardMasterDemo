@@ -40,7 +40,7 @@ public class EntityMapper {
         CardApplicationDto dto = new CardApplicationDto();
         dto.setApplicationId(app.getApplicationId());
         dto.setCustomerId(app.getCustomer().getCustomerId());
-        dto.setProductId(app.getProduct().productId());
+        dto.setProductId(app.getProduct().getProductId());
         dto.setRequestedLimit(app.getRequestedLimit());
         dto.setApplicationDate(app.getApplicationDate());
         dto.setStatus(app.getStatus().name());
