@@ -29,7 +29,7 @@ public class CardApplicationService {
 
     // --- Create Application (initially Submitted) ---
     public CardApplicationDto create(CardApplicationDto dto, String token) {
-        jwtUtil.extractUsername(token.substring(7)); // validate token
+        jwtUtil.extractUsername(token.substring(7));//validate token
 
         Customer customer = customerRepository.findById(dto.getCustomerId())
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + dto.getCustomerId()));
