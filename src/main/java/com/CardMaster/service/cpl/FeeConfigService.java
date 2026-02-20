@@ -1,24 +1,41 @@
+// src/main/java/com/CardMaster/service/FeeConfigService.java
 package com.CardMaster.service.cpl;
 
 import com.CardMaster.model.cpl.FeeConfig;
+import com.CardMaster.mapper.cpl.FeeConfigMapper;
+import com.CardMaster.dao.cpl.FeeConfigRepository;
+import com.CardMaster.dto.cpl.response.FeeConfigResponse;
+import com.CardMaster.exceptions.cpl.NotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 
-public interface FeeConfigService {
+@Service
+public class FeeConfigService {
 
-    FeeConfig create(FeeConfig entity);
+    private final FeeConfigRepository feeRepo;
+    private final FeeConfigMapper mapper;
 
-    List<FeeConfig> findAll();
+    public FeeConfigService(FeeConfigRepository feeRepo, FeeConfigMapper mapper) {
+        this.feeRepo = feeRepo;        // ✅ you forgot this line earlier
+        this.mapper = mapper;
+    }
 
-    Optional<FeeConfig> findById(Long id);
+    /** Update only the amount (immutable style: rebuild and save) */
+    @Transactional
+    public FeeConfigResponse updateAmount(Long feeId, BigDecimal newAmount) {
+        FeeConfig fee = feeRepo.findById(feeId)
+                .orElseThrow(() -> new NotFoundException("FeeConfig not found")); // ✅ one-arg ctor
 
-    /**
-     * Updates only the amount for the given fee config.
-     * Returns the updated entity.
-     */
-    FeeConfig updateAmount(Long id, BigDecimal newAmount);
+        // Rebuild immutable entity with updated amount (no setters)
+        FeeConfig updated = new FeeConfig(
+                fee.feeId(),      // same PK
+                fee.product(),    // same relation
+                fee.feeType(),    // same enum
+                newAmount         // new amount
+        );
 
-    void deleteById(Long id);
+        return mapper.toResponse(feeRepo.save(updated));
+    }
 }
