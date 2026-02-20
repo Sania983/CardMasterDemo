@@ -1,32 +1,34 @@
 package com.CardMaster.mapper.cpl;
 
+import com.CardMaster.dto.cpl.FeeConfigRequestDto;
+import com.CardMaster.dto.cpl.FeeConfigResponseDto;
 import com.CardMaster.model.cpl.CardProduct;
 import com.CardMaster.model.cpl.FeeConfig;
-import com.CardMaster.dto.cpl.request.FeeConfigRequest;
-import com.CardMaster.dto.cpl.response.FeeConfigResponse;
-import org.mapstruct.Context;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ObjectFactory;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
+@Component
+public class FeeConfigMapper {
 
-@Mapper(componentModel = "spring")
-public interface FeeConfigMapper {
-
-    // Build a new FeeConfig using the request + the already-loaded CardProduct
-    @ObjectFactory
-    default FeeConfig create(FeeConfigRequest dto, @Context CardProduct product) {
-        // constructor: (Long feeId, CardProduct product, FeeType feeType, BigDecimal amount)
-        return new FeeConfig(null, product, dto.feeType(), dto.amount());
+    public FeeConfig toEntity(FeeConfigRequestDto req, CardProduct product) {
+        FeeConfig e = new FeeConfig();
+        e.setProduct(product);
+        e.setFeeType(req.getFeeType());
+        e.setAmount(req.getAmount());
+        return e;
     }
 
-    // Entity -> DTO using expressions (since mapper is in another package and we use non-bean accessors)
-    @Mapping(target = "feeId",     expression = "java(e.feeId())")
-    @Mapping(target = "productId", expression = "java(e.product().productId())")
-    @Mapping(target = "feeType",   expression = "java(e.feeType())")
-    @Mapping(target = "amount",    expression = "java(e.amount())")
-    FeeConfigResponse toResponse(FeeConfig e);
+    public void updateEntity(FeeConfig e, FeeConfigRequestDto req, CardProduct maybeNewProduct) {
+        if (maybeNewProduct != null) e.setProduct(maybeNewProduct);
+        if (req.getFeeType() != null) e.setFeeType(req.getFeeType());
+        if (req.getAmount() != null) e.setAmount(req.getAmount());
+    }
 
-    List<FeeConfigResponse> toResponses(List<FeeConfig> entities);
+    public FeeConfigResponseDto toResponse(FeeConfig e) {
+        return FeeConfigResponseDto.builder()
+                .feeId(e.getFeeId())
+                .productId(e.getProduct().getProductId())
+                .feeType(e.getFeeType())
+                .amount(e.getAmount())
+                .build();
+    }
 }

@@ -1,16 +1,21 @@
 package com.CardMaster.dto.cias;
 
 import lombok.Data;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
+
 @Data
-public class CardAccountResponseDTO {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CardAccountResponseDto {
     private Long accountId;
     private Long cardId;
     private Double creditLimit;
     private Double availableLimit;
     private LocalDate openDate;
-    private String status;
-
-    // getters and setters
+    private String status; // ACTIVE, CLOSED
 }

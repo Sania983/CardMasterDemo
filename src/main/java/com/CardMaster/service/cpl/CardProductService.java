@@ -1,21 +1,38 @@
 package com.CardMaster.service.cpl;
 
+import com.CardMaster.dto.cpl.CardProductRequestDto;
+import com.CardMaster.dto.cpl.CardProductResponseDto;
+import com.CardMaster.mapper.cpl.CardProductMapper;
 import com.CardMaster.model.cpl.CardProduct;
-import com.CardMaster.dto.cpl.request.CardProductCreateRequest;
-import com.CardMaster.dto.cpl.request.CardProductUpdateRequest;
-import com.CardMaster.dto.cpl.response.CardProductResponse;
-import com.CardMaster.dto.cpl.response.FeeConfigResponse;
+import com.CardMaster.dao.cpl.CardProductRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public interface CardProductService {
+@Service
+@RequiredArgsConstructor
+public class CardProductService {
 
-    CardProductResponse createProduct(CardProductCreateRequest dto);
+    private final CardProductRepository repository;
+    private final CardProductMapper mapper;
 
-    CardProductResponse updateProduct(CardProductUpdateRequest dto);
+    public CardProductResponseDto create(CardProductRequestDto request) {
+        CardProduct entity = mapper.toEntity(request);
+        CardProduct saved = repository.save(entity);
+        return mapper.toResponse(saved);
+    }
 
-    // Keeping this as entity list as per your earlier code; you can switch to DTO later.
-    List<CardProduct> getAllProducts();
+    public List<CardProductResponseDto> findAll() {
+        return repository.findAll()
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
+    }
 
-    FeeConfigResponse addFeeToProduct(Long productId, String type, Double amount);
+    public CardProductResponseDto findById(Long id) {
+        CardProduct entity = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        return mapper.toResponse(entity);
+    }
 }
