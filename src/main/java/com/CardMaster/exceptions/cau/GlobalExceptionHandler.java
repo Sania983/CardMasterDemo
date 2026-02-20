@@ -1,23 +1,41 @@
 package com.CardMaster.exceptions.cau;
 
+import com.CardMaster.dto.cau.ResponseStructure;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice(basePackages = "com.CardMaster.controller.cau")
+@RestControllerAdvice(basePackages = "com.CardMaster.controller.cau")
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleNotFound(ResourceNotFoundException ex) {
-        return ResponseEntity.status(404).body(ex.getMessage());
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ResponseStructure<String>> handleNotFound(EntityNotFoundException ex) {
+        ResponseStructure<String> body = new ResponseStructure<>();
+        body.setStatus("error");
+        body.setMessage(ex.getMessage());
+        body.setData(null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<String> handleBadRequest(BadRequestException ex) {
-        return ResponseEntity.status(400).body(ex.getMessage());
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ResponseStructure<String>> handleValidation(ValidationException ex) {
+        ResponseStructure<String> body = new ResponseStructure<>();
+        body.setStatus("error");
+        body.setMessage(ex.getMessage());
+        body.setData(null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleOther(Exception ex) {
-        return ResponseEntity.status(500).body("Something went wrong: " + ex.getMessage());
+    @ExceptionHandler(UnauthorizedActionException.class)
+    public ResponseEntity<ResponseStructure<String>> handleUnauthorized(UnauthorizedActionException ex) {
+        ResponseStructure<String> body = new ResponseStructure<>();
+        body.setStatus("error");
+        body.setMessage(ex.getMessage());
+        body.setData(null);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
+
+
+
 }
