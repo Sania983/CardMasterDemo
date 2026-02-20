@@ -1,31 +1,19 @@
 package com.CardMaster.dto.iam;
 
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuditLogDto {
-    private Long auditId;
-    private Long userId;
-    private String action;
-    private String resource;
-    private LocalDateTime timestamp;
-    private String metadata;
-
-    // Getters and Setters
-    public Long getAuditId() { return auditId; }
-    public void setAuditId(Long auditId) { this.auditId = auditId; }
-
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
-
-    public String getAction() { return action; }
-    public void setAction(String action) { this.action = action; }
-
-    public String getResource() { return resource; }
-    public void setResource(String resource) { this.resource = resource; }
-
-    public LocalDateTime getTimestamp() { return timestamp; }
-    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
-
-    public String getMetadata() { return metadata; }
-    public void setMetadata(String metadata) { this.metadata = metadata; }
+    private Long id;              // Primary key of the audit log
+    private String username;      // Who performed the action
+    private String action;        // e.g., LOGIN, LOGOUT, REGISTER
+    private String description;   // Details about the action
+    private LocalDateTime timestamp; // When the action occurred
 }

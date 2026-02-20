@@ -12,7 +12,7 @@ public class Document {
     private Long documentId;
 
     @ManyToOne
-    @JoinColumn(name = "application_id")
+    @JoinColumn(name = "application_id",nullable = false)
     private CardApplication application;
 
     @Enumerated(EnumType.STRING)
@@ -36,6 +36,8 @@ public class Document {
     // Enum for document status
     public enum DocumentStatus {
         Submitted,
-        NotSubmitted
+        NotSubmitted,
+        Verified,
+        Rejected
     }
 }

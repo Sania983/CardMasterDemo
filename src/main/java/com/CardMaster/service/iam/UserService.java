@@ -1,49 +1,70 @@
 package com.CardMaster.service.iam;
 
-import com.CardMaster.dao.iam.AuditLogRepository;
 import com.CardMaster.dao.iam.UserRepository;
+import com.CardMaster.dao.iam.AuditLogRepository;
+import com.CardMaster.dto.iam.UserDto;
+import com.CardMaster.exceptions.iam.InvalidCredentialsException;
+import com.CardMaster.exceptions.iam.UserNotFoundException;
+import com.CardMaster.mapper.iam.UserMapper;
 import com.CardMaster.model.iam.AuditLog;
 import com.CardMaster.model.iam.User;
-
+import com.CardMaster.security.iam.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final AuditLogRepository auditLogRepository;
+    private final JwtUtil jwtUtil;
 
-    public UserService(UserRepository userRepository, AuditLogRepository auditLogRepository) {
-        this.userRepository = userRepository;
-        this.auditLogRepository = auditLogRepository;
+    // Get all users
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::toDto)
+                .toList();
     }
 
-    public List<User> getAllUser() {
-        return userRepository.findAll();
-    }
-
-    public User getById(Long userId) {
-        return userRepository.findById(userId).orElse(null);
-    }
-
-    public User registerUser(User user) {
-        User saved = userRepository.save(user);
-        logAction(saved, "REGISTER", "User Registration");
-        return saved;
-    }
-
-    public User loginUserByUserId(Long userId, String name) {
+    // Get user by ID
+    public User getUserById(Long userId) {
         return userRepository.findById(userId)
-                .filter(u -> u.getName().equals(name)) // replace with password hashing
-                .map(u -> {
-                    logAction(u, "LOGIN", "User Login");
-                    return u;
-                })
-                .orElse(null);
+                .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
+    // Register new user
+    public User registerUser(User user) {
+        User savedUser = userRepository.save(user);
+        logAction(savedUser, "REGISTER", "User Registration");
+        return savedUser;
+    }
+
+    // Login user by ID + password
+    public String loginUser(Long userId, String password) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        if (!user.getPassword().equals(password)) {
+            logAction(user, "LOGIN_FAILED", "Invalid credentials");
+            throw new InvalidCredentialsException();
+        }
+
+        logAction(user, "LOGIN", "User Login");
+        return jwtUtil.generateToken(user.getUserId().toString());
+    }
+
+    // Logout user
+    public void logoutUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        logAction(user, "LOGOUT", "User Logout");
+    }
+
+    // Helper method to save audit logs
     private void logAction(User user, String action, String resource) {
         AuditLog log = new AuditLog();
         log.setUser(user);
