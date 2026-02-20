@@ -3,40 +3,46 @@ package com.CardMaster.controller.cias;
 import com.CardMaster.model.cias.Card;
 import com.CardMaster.model.cias.CardAccount;
 import com.CardMaster.service.cias.CardIssuanceService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/cards")
+@RequestMapping("/api/cards")
+@RequiredArgsConstructor
 public class CardIssuanceController {
 
-    @Autowired
-    private CardIssuanceService cardIssuanceService;
+    private final CardIssuanceService cardIssuanceService;
 
+    // Issue a new card and create its account
     @PostMapping("/issue")
-    public CardAccount issueCard(@RequestParam Long customerId,
-                                 @RequestParam Long productId,
-                                 @RequestParam Double creditLimit) {
-        return cardIssuanceService.issueCard(customerId, productId, creditLimit);
+    public ResponseEntity<CardAccount> issueCard(@RequestParam Long customerId,
+                                                 @RequestParam Long productId,
+                                                 @RequestParam Double creditLimit,
+                                                 @RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(
+                cardIssuanceService.issueCard(customerId, productId, creditLimit, token)
+        );
     }
 
+    // Get all cards
     @GetMapping
-    public List<Card> getAllCards() {
-        return cardIssuanceService.getAllCards();
+    public ResponseEntity<List<Card>> getAllCards() {
+        return ResponseEntity.ok(cardIssuanceService.getAllCards());
     }
 
+    // Get all accounts
     @GetMapping("/accounts")
-    public List<CardAccount> getAllAccounts() {
-        return cardIssuanceService.getAllAccounts();
+    public ResponseEntity<List<CardAccount>> getAllAccounts() {
+        return ResponseEntity.ok(cardIssuanceService.getAllAccounts());
     }
 
-    @PostMapping("/create")
-    public Card createCard(@RequestBody Card card) {
-        return cardIssuanceService.saveCard(card);
+    // Create a card directly (without issuing account)
+    @PostMapping
+    public ResponseEntity<Card> createCard(@RequestBody Card card) {
+        return ResponseEntity.ok(cardIssuanceService.saveCard(card));
     }
-
-
-
 }
