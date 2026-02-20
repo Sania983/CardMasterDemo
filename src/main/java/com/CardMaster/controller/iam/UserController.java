@@ -72,7 +72,7 @@ public class UserController {
 
     // POST login (using userId + password)
     @PostMapping("/login")
-    public ResponseEntity<ResponseStructure<String>> login(@Valid @RequestBody User user) {
+    public ResponseEntity<ResponseStructure<String>> login(@RequestBody User user) {
         log.info("Inside login Controller");
 
         String token = userService.loginUser(user.getUserId(), user.getPassword());
