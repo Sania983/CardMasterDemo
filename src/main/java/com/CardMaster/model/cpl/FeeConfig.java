@@ -1,44 +1,34 @@
-// src/main/java/com/CardMaster/Entity/FeeConfig.java
 package com.CardMaster.model.cpl;
 
 import com.CardMaster.Enum.cpl.FeeType;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
+import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "fee_config",
-        uniqueConstraints = @UniqueConstraint(name = "uk_product_fee", columnNames = {"product_id", "fee_type"}))
-@Access(AccessType.FIELD)
+@Table(name = "fee_config")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class FeeConfig {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long feeId;
+    private Long feeId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    CardProduct product;
+    private com.CardMaster.model.cpl.CardProduct product;   // ✅ keep name as 'product'
 
     @Enumerated(EnumType.STRING)
     @Column(name = "fee_type", nullable = false, length = 20)
-    FeeType feeType;
+    private FeeType feeType;
 
+    @Positive
     @Column(nullable = false, precision = 12, scale = 2)
-    BigDecimal amount;
-
-    protected FeeConfig() { }
-
-    // ✅ public 4-arg constructor: MUST match types & order
-    public FeeConfig(Long feeId, CardProduct product, FeeType feeType, BigDecimal amount) {
-        this.feeId = feeId;
-        this.product = product;
-        this.feeType = feeType;
-        this.amount = amount;
-    }
-
-    // ✅ non-bean accessors (mapper in another package uses these)
-    public Long feeId()         { return feeId; }
-    public CardProduct product(){ return product; }
-    public FeeType feeType()    { return feeType; }
-    public BigDecimal amount()  { return amount; }
+    private Double amount;         // You can switch to BigDecimal later if needed
 }
