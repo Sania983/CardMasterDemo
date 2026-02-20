@@ -28,11 +28,11 @@ public class CardProduct {
     private CardCategory category;
 
     @Positive
-    @Column(nullable = false, precision = 5, scale = 2)
+    @Column(nullable = false)
     private Double interestRate;
 
     @Positive
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Column(nullable = false)
     private Double annualFee;
 
     @Enumerated(EnumType.STRING)
