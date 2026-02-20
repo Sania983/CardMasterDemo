@@ -1,7 +1,6 @@
 package com.CardMaster.service.paa;
 
 import com.CardMaster.dao.paa.CardApplicationRepository;
-import com.CardMaster.dao.paa.CustomerRepository;
 import com.CardMaster.dto.paa.CardApplicationDto;
 import com.CardMaster.exception.paa.ApplicationNotFoundException;
 import com.CardMaster.exception.paa.CustomerNotFoundException;

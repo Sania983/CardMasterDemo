@@ -1,5 +1,4 @@
 package com.CardMaster.service.paa;
-import com.CardMaster.dao.paa.CustomerRepository;
 import com.CardMaster.dto.paa.CustomerDto;
 import com.CardMaster.exception.paa.CustomerNotFoundException;
 import com.CardMaster.mapper.paa.EntityMapper;
