@@ -3,13 +3,34 @@ package com.CardMaster.dto.cpl.request;
 import com.CardMaster.Enum.cpl.CardCategory;
 import com.CardMaster.Enum.cpl.ProductStatus;
 import jakarta.validation.constraints.*;
+import lombok.*;
+
 import java.math.BigDecimal;
 
-public record CardProductUpdateRequest(
-        @NotNull Long productId,                 // <-- must be 'productId'
-        @NotBlank String name,
-        @NotNull  CardCategory category,
-        @DecimalMin("0.00") @DecimalMax("100.00") BigDecimal interestRate,
-        @DecimalMin("0.00") BigDecimal annualFee,
-        @NotNull  ProductStatus status
-) {}
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CardProductUpdateRequest {
+
+    @NotNull
+    private Long productId; // must be provided for update
+
+    @NotBlank
+    private String name;
+
+    @NotNull
+    private CardCategory category;
+
+    @NotNull
+    @DecimalMin("0.00")
+    @DecimalMax("100.00")
+    private BigDecimal interestRate;
+
+    @NotNull
+    @DecimalMin("0.00")
+    private BigDecimal annualFee;
+
+    @NotNull
+    private ProductStatus status;
+}

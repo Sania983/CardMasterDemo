@@ -1,7 +1,6 @@
 package com.CardMaster.mapper.cpl;
 
 import com.CardMaster.model.cpl.CardProduct;
-import com.CardMaster.model.cpl.FeeConfig;
 import com.CardMaster.dto.cpl.request.FeeConfigRequest;
 import com.CardMaster.dto.cpl.response.FeeConfigResponse;
 import org.mapstruct.Context;

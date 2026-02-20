@@ -1,20 +1,15 @@
 
 package com.CardMaster.service.cau;
 
-import com.CardMaster.dao.*;
-import com.CardMaster.dao.cau.*;
 import com.CardMaster.dao.cau.CreditScoreRepository;
 import com.CardMaster.dao.cau.UnderwritingDecisionRepository;
-import com.CardMaster.dao.cau.UserRepository;
 import com.CardMaster.dto.cau.CreditScoreGenerateRequest;
 import com.CardMaster.dto.cau.CreditScoreResponse;
 import com.CardMaster.dto.cau.UnderwritingDecisionRequest;
 import com.CardMaster.dto.cau.UnderwritingDecisionResponse;
 import com.CardMaster.exceptions.cau.ResourceNotFoundException;
 import com.CardMaster.mapper.cau.UnderwritingMapper;
-import com.CardMaster.model.*;
 import com.CardMaster.Enum.cau.UnderwritingDecisionType;
-import com.CardMaster.dto.*;
 import com.CardMaster.model.cau.CardApplication;
 import com.CardMaster.model.cau.CreditScore;
 import com.CardMaster.model.cau.UnderwritingDecision;

@@ -1,6 +1,5 @@
 package com.CardMaster.controller.cau;
 
-import com.CardMaster.dao.cau.UserRepository;
 import com.CardMaster.dao.paa.CardApplicationRepository;
 import com.CardMaster.service.cau.UnderwritingService;
 import com.CardMaster.model.cau.UserCau;

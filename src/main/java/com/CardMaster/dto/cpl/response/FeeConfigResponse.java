@@ -1,11 +1,19 @@
 package com.CardMaster.dto.cpl.response;
 
+import com.CardMaster.model.cpl.CardProduct;
 import com.CardMaster.Enum.cpl.FeeType;
-import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public record FeeConfigResponse(
-        Long feeId,
-        Long productId,
-        FeeType feeType,
-        BigDecimal amount
-) {}
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class FeeConfigResponse {
+
+    private long feeId;
+
+    private CardProduct product;
+
+    private FeeType feeType;
+}
