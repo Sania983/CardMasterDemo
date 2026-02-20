@@ -1,4 +1,6 @@
 package com.CardMaster.Enum.cias;
-
-public class s {
+public enum CardStatus {
+    ISSUED,
+    ACTIVE,
+    BLOCKED
 }

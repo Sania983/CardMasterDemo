@@ -1,9 +1,11 @@
 
 package com.CardMaster.mapper.cias;
 
+import com.CardMaster.model.cias.CardAccount;
+import com.CardMaster.Enum.cias.AccountStatus;
 import com.CardMaster.dto.cias.CardAccountRequestDto;
 import com.CardMaster.dto.cias.CardAccountResponseDto;
-import com.CardMaster.model.cias.CardAccount;
+import com.CardMaster.dto.cias.CardResponseDto;
 
 public class CardAccountMapper {
 
@@ -12,7 +14,7 @@ public class CardAccountMapper {
         account.setCardId(dto.getCardId());
         account.setCreditLimit(dto.getCreditLimit());
         account.setAvailableLimit(dto.getAvailableLimit());
-        account.setStatus(CardAccount.Status.valueOf(dto.getStatus().toUpperCase()));
+        account.setStatus(AccountStatus.Status.valueOf(dto.getStatus().toUpperCase()));
         return account;
     }
 

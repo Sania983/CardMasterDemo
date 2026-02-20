@@ -40,5 +40,5 @@ public class CardAccount {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private CardAccount status;  // ACTIVE, CLOSED
+    private AccountStatus status;  // ACTIVE, CLOSED
 }

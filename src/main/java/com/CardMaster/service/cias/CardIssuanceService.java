@@ -5,7 +5,7 @@ import com.CardMaster.dao.cias.CardAccountRepository;
 import com.CardMaster.exception.CardIssuanceException;
 import com.CardMaster.model.cias.Card;
 import com.CardMaster.model.cias.CardAccount;
-import com.CardMaster.security.JwtUtil; // assuming you have this utility
+import com.CardMaster.security.iam.JwtUtil; // assuming you have this utility
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

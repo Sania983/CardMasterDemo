@@ -1,10 +1,15 @@
 package com.CardMaster.model.cias;
 
+import com.CardMaster.Enum.cias.CardStatus;
 import com.CardMaster.model.paa.Customer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 
 import java.time.LocalDate;
 
@@ -43,5 +48,5 @@ public class Card {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private Card status;  // ISSUED, ACTIVE, BLOCKED
+    private CardStatus status;  // ISSUED, ACTIVE, BLOCKED
 }

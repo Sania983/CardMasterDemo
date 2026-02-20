@@ -1,5 +1,7 @@
 package com.CardMaster.mapper.cias;
 
+import com.CardMaster.model.cias.Card;
+import com.CardMaster.Enum.cias.CardStatus;
 import com.CardMaster.dto.cias.CardRequestDto;
 import com.CardMaster.dto.cias.CardResponseDto;
 import com.CardMaster.model.cias.Card;
@@ -13,7 +15,7 @@ public class CardMapper {
         card.setMaskedCardNumber(dto.getMaskedCardNumber());
         card.setExpiryDate(dto.getExpiryDate());
         card.setCvvHash(dto.getCvvHash());
-        card.setStatus(Card.Status.valueOf(dto.getStatus().toUpperCase()));
+        card.setStatus(CardStatus.Status.valueOf(dto.getStatus().toUpperCase()));
         return card;
     }
 
