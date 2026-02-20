@@ -1,11 +1,11 @@
 package com.CardMaster.controller.iam;
 
-import com.CardMaster.model.iam.User;
-import com.CardMaster.security.iam.JwtUtil;
-import com.CardMaster.service.iam.UserService;
 import com.CardMaster.dto.iam.ResponseStructure;
 import com.CardMaster.dto.iam.UserDto;
 import com.CardMaster.mapper.iam.UserMapper;
+import com.CardMaster.model.iam.User;
+import com.CardMaster.security.iam.JwtUtil;
+import com.CardMaster.service.iam.UserService;
 import com.CardMaster.service.iam.AuditLogService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,21 +13,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/users")   // Base path is now /users
-public class RegisterController {
+@RequestMapping("/users")
+public class UserController {
 
-    private static final Logger log = LogManager.getLogger(RegisterController.class);
+    private static final Logger log = LogManager.getLogger(UserController.class);
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final AuditLogService auditLogService;
 
-    // ✅ Constructor injection for all dependencies
-    public RegisterController(UserService userService, JwtUtil jwtUtil, AuditLogService auditLogService) {
+    public UserController(UserService userService, JwtUtil jwtUtil, AuditLogService auditLogService) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.auditLogService = auditLogService;
@@ -37,10 +36,7 @@ public class RegisterController {
     @GetMapping
     public ResponseEntity<ResponseStructure<List<UserDto>>> getAllUsers() {
         log.info("Inside getAllUsers Controller");
-        List<UserDto> users = userService.getAllUsers()
-                .stream()
-                .map(UserMapper::toDto)
-                .collect(Collectors.toList());
+        List<UserDto> users = userService.getAllUsers();
 
         ResponseStructure<List<UserDto>> res = new ResponseStructure<>();
         res.setMsg("Users Retrieved Successfully");
@@ -55,22 +51,18 @@ public class RegisterController {
         User user = userService.getUserById(userId);
 
         ResponseStructure<UserDto> res = new ResponseStructure<>();
-        if (user != null) {
-            res.setMsg("User Retrieved Successfully");
-            res.setData(UserMapper.toDto(user));
-            return ResponseEntity.status(HttpStatus.OK).body(res);
-        } else {
-            res.setMsg("User Not Found");
-            res.setData(null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
-        }
+        res.setMsg("User Retrieved Successfully");
+        res.setData(UserMapper.toDto(user));
+        return ResponseEntity.status(HttpStatus.OK).body(res);
     }
 
     // POST register new user
     @PostMapping("/register")
-    public ResponseEntity<ResponseStructure<UserDto>> register(@RequestBody User user) {
+    public ResponseEntity<ResponseStructure<UserDto>> register(@Valid @RequestBody User user) {
         log.info("Inside register user Controller");
         User saved = userService.registerUser(user);
+
+        auditLogService.log(saved.getEmail(), "REGISTER", "User Registration");
 
         ResponseStructure<UserDto> resp = new ResponseStructure<>();
         resp.setMsg("User created successfully");
@@ -78,11 +70,15 @@ public class RegisterController {
         return ResponseEntity.status(HttpStatus.CREATED).body(resp);
     }
 
-    // POST login
+    // POST login (using userId + password)
     @PostMapping("/login")
-    public ResponseEntity<ResponseStructure<String>> login(@RequestBody User userd) {
-        // ✅ Use password for login, not name
-        String token = userService.loginUser(userd.getUserId(), userd.getName());
+    public ResponseEntity<ResponseStructure<String>> login(@Valid @RequestBody User user) {
+        log.info("Inside login Controller");
+
+        String token = userService.loginUser(user.getUserId(), user.getPassword());
+
+        auditLogService.log(user.getEmail(), "LOGIN", "User Login");
+
         ResponseStructure<String> r = new ResponseStructure<>();
         r.setMsg("Login Successful");
         r.setData("Bearer " + token);
