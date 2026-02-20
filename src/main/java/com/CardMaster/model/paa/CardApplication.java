@@ -27,7 +27,7 @@ public class CardApplication {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
-    private CardProduct productId;
+    private CardProduct product;
 
     private Double requestedLimit;
 
