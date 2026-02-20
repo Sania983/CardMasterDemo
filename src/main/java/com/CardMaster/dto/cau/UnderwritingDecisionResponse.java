@@ -2,9 +2,15 @@
 package com.CardMaster.dto.cau;
 
 import com.CardMaster.Enum.cau.UnderwritingDecisionType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UnderwritingDecisionResponse {
     private Long decisionId;
     private Long applicationId;

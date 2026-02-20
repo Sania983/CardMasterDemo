@@ -1,97 +1,92 @@
-
 package com.CardMaster.service.cau;
 
-import com.CardMaster.dao.*;
-import com.CardMaster.dao.cau.*;
-import com.CardMaster.dao.cau.CreditScoreRepository;
-import com.CardMaster.dao.cau.UnderwritingDecisionRepository;
-import com.CardMaster.dao.cau.UserRepository;
-import com.CardMaster.dto.cau.CreditScoreGenerateRequest;
-import com.CardMaster.dto.cau.CreditScoreResponse;
-import com.CardMaster.dto.cau.UnderwritingDecisionRequest;
-import com.CardMaster.dto.cau.UnderwritingDecisionResponse;
-import com.CardMaster.exceptions.cau.ResourceNotFoundException;
-import com.CardMaster.mapper.cau.UnderwritingMapper;
-import com.CardMaster.model.*;
-import com.CardMaster.Enum.cau.UnderwritingDecisionType;
-import com.CardMaster.dto.*;
-import com.CardMaster.model.cau.CardApplication;
-import com.CardMaster.model.cau.CreditScore;
-import com.CardMaster.model.cau.UnderwritingDecision;
-import com.CardMaster.model.cau.User;
+import com.CardMaster.dao.CardApplicationRepository;
+import com.CardMaster.dao.CreditScoreRepository;
+import com.CardMaster.dao.UnderwritingDecisionRepository;
+import com.CardMaster.dao.UserRepository1;
+import com.CardMaster.dao.iam.UserRepository1;
+import com.CardMaster.exception.ResourceNotFoundException;
+import com.CardMaster.mapper.UnderwritingMapper;
+import com.CardMaster.model.CardApplication;
+import com.CardMaster.model.CreditScore;
+import com.CardMaster.model.UnderwritingDecision;
+import com.CardMaster.model.User;
+import com.CardMaster.Enum.UnderwritingDecisionType;
+import com.CardMaster.dto.CreditScoreGenerateRequest;
+import com.CardMaster.dto.CreditScoreResponse;
+import com.CardMaster.dto.UnderwritingDecisionRequest;
+import com.CardMaster.dto.UnderwritingDecisionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 public class UnderwritingService {
 
-    @Autowired private CreditScoreRepository scoreRepo;
-    @Autowired private UnderwritingDecisionRepository decisionRepo;
-    @Autowired private CardApplicationRepository appRepo;
-    @Autowired private UserRepository userRepo;
+    @Autowired
+    private CreditScoreRepository scoreRepo;
+    @Autowired
+    private UnderwritingDecisionRepository decisionRepo;
+    @Autowired
+    private CardApplicationRepository appRepo;
+    @Autowired
+    private UserRepository1 userRepo;
+    @Autowired
+    private UnderwritingMapper mapper;
 
-    // CREATE score (with relationship)
     public CreditScoreResponse generateScore(CreditScoreGenerateRequest req) {
-
         CardApplication app = appRepo.findById(req.getApplicationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found: " + req.getApplicationId()));
 
-        CreditScore cs = new CreditScore();
-        cs.setApplication(app);                       // relationship set here
-        cs.setBureauScore(req.getBureauScore());
-        cs.setInternalScore(req.getBureauScore() / 10); // simple formula
-        cs.setGeneratedDate(LocalDateTime.now());
+        // request -> entity
+        CreditScore cs = mapper.fromRequest(req, app);
 
-        return UnderwritingMapper.toScoreResponse(scoreRepo.save(cs));
+        // save -> entity
+        cs = scoreRepo.save(cs);
+
+        // entity -> response
+        return mapper.toDto(cs);
     }
 
-    // READ latest score
     public CreditScoreResponse getLatestScore(Long applicationId) {
         CreditScore cs = scoreRepo
                 .findTopByApplication_ApplicationIdOrderByGeneratedDateDesc(applicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Score not found for ApplicationID: " + applicationId));
-        return UnderwritingMapper.toScoreResponse(cs);
+        return mapper.toDto(cs);
     }
 
-    // CREATE decision (with relationships)
+    // -------- DECISION --------
     public UnderwritingDecisionResponse createDecision(UnderwritingDecisionRequest req) {
-
         CardApplication app = appRepo.findById(req.getApplicationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found: " + req.getApplicationId()));
 
         User underwriter = userRepo.findById(req.getUnderwriterId())
                 .orElseThrow(() -> new ResourceNotFoundException("Underwriter not found: " + req.getUnderwriterId()));
 
-        // if decision not provided → auto from latest score
-        UnderwritingDecisionType finalDecision = req.getDecision();
-        if (finalDecision == null) {
+        // request -> entity
+        UnderwritingDecision dec = mapper.fromRequest(req, app, underwriter);
+
+        // if decision not provided, auto-decide using latest score
+        if (dec.getDecision() == null) {
             CreditScore latest = scoreRepo
                     .findTopByApplication_ApplicationIdOrderByGeneratedDateDesc(req.getApplicationId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Generate score first"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Generate score first for application: " + req.getApplicationId()));
             int internal = latest.getInternalScore();
-            if (internal >= 70) finalDecision = UnderwritingDecisionType.APPROVE;
-            else if (internal >= 50) finalDecision = UnderwritingDecisionType.CONDITIONAL;
-            else finalDecision = UnderwritingDecisionType.REJECT;
+            if (internal >= 70) dec.setDecision(UnderwritingDecisionType.APPROVE);
+            else if (internal >= 50) dec.setDecision(UnderwritingDecisionType.CONDITIONAL);
+            else dec.setDecision(UnderwritingDecisionType.REJECT);
         }
 
-        UnderwritingDecision dec = new UnderwritingDecision();
-        dec.setApplication(app);              // relationship set here
-        dec.setUnderwriter(underwriter);      // relationship set here
-        dec.setDecision(finalDecision);
-        dec.setApprovedLimit(req.getApprovedLimit());
-        dec.setRemarks(req.getRemarks());
-        dec.setDecisionDate(LocalDateTime.now());
+        // save -> entity
+        dec = decisionRepo.save(dec);
 
-        return UnderwritingMapper.toDecisionResponse(decisionRepo.save(dec));
+        // entity -> response
+        return mapper.toDto(dec);
     }
 
-    // READ latest decision
     public UnderwritingDecisionResponse getLatestDecision(Long applicationId) {
         UnderwritingDecision dec = decisionRepo
                 .findTopByApplication_ApplicationIdOrderByDecisionDateDesc(applicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Decision not found for ApplicationID: " + applicationId));
-        return UnderwritingMapper.toDecisionResponse(dec);
+        return mapper.toDto(dec);
     }
 }
