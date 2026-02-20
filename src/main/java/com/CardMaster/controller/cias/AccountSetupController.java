@@ -2,32 +2,34 @@ package com.CardMaster.controller.cias;
 
 import com.CardMaster.model.cias.CardAccount;
 import com.CardMaster.service.cias.AccountSetupService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/accounts")
+@RequestMapping("/api/accounts")
+@RequiredArgsConstructor
 public class AccountSetupController {
 
-    @Autowired
-    private AccountSetupService accountSetupService;
+    private final AccountSetupService accountSetupService;
 
-    @PostMapping("/create")
-    public CardAccount createAccount(@RequestBody CardAccount account) {
-        return accountSetupService.createAccount(account);
+    // Create a new account
+    @PostMapping
+    public ResponseEntity<CardAccount> createAccount(@RequestBody CardAccount account) {
+        return ResponseEntity.ok(accountSetupService.createAccount(account));
     }
 
+    // Get all accounts
     @GetMapping
-    public List<CardAccount> getAllAccounts() {
-        return accountSetupService.getAllAccounts();
+    public ResponseEntity<List<CardAccount>> getAllAccounts() {
+        return ResponseEntity.ok(accountSetupService.getAllAccounts());
     }
 
+    // Get account by ID
     @GetMapping("/{id}")
-    public CardAccount getAccountById(@PathVariable Long id) {
-        return accountSetupService.getAccountById(id);
+    public ResponseEntity<CardAccount> getAccountById(@PathVariable Long id) {
+        return ResponseEntity.ok(accountSetupService.getAccountById(id));
     }
-
-
 }

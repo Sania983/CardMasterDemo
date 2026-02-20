@@ -1,12 +1,12 @@
 package com.CardMaster.mapper.cias;
 
-import com.CardMaster.dto.cias.CardRequestDTO;
-import com.CardMaster.dto.cias.CardResponseDTO;
+import com.CardMaster.dto.cias.CardRequestDto;
+import com.CardMaster.dto.cias.CardResponseDto;
 import com.CardMaster.model.cias.Card;
 
 public class CardMapper {
 
-    public static Card toEntity(CardRequestDTO dto) {
+    public static Card toEntity(CardRequestDto dto) {
         Card card = new Card();
         card.setCustomerId(dto.getCustomerId());
         card.setProductId(dto.getProductId());
@@ -17,8 +17,8 @@ public class CardMapper {
         return card;
     }
 
-    public static CardResponseDTO toDTO(Card card) {
-        CardResponseDTO dto = new CardResponseDTO();
+    public static CardResponseDto toDTO(Card card) {
+        CardResponseDto dto = new CardResponseDto();
         dto.setCardId(card.getCardId());
         dto.setCustomerId(card.getCustomerId());
         dto.setProductId(card.getProductId());

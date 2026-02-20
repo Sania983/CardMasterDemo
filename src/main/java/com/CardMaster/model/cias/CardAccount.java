@@ -1,30 +1,44 @@
 package com.CardMaster.model.cias;
 
+import com.CardMaster.model.cias.Card;
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "cardaccount")
+@Table(name = "card_accounts")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CardAccount {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "account_id")
     private Long accountId;
 
-    private Long cardId;
+    @OneToOne(optional = false)
+    @JoinColumn(name = "card_id", nullable = false, unique = true)
+    private Card card;
+
+    @Positive
+    @Column(name = "credit_limit", nullable = false)
     private Double creditLimit;
+
+    @PositiveOrZero
+    @Column(name = "available_limit", nullable = false)
     private Double availableLimit;
+
+    @NotNull
+    @Column(name = "open_date", nullable = false)
     private LocalDate openDate;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
-
-
-    public enum Status {
-        Active,
-        Closed
-    }
+    @Column(name = "status", nullable = false)
+    private CardAccount status;  // ACTIVE, CLOSED
 }
