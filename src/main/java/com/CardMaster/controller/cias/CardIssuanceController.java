@@ -5,6 +5,7 @@ import com.CardMaster.model.cias.CardAccount;
 import com.CardMaster.service.cias.CardIssuanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,9 +21,10 @@ public class CardIssuanceController {
     @PostMapping("/issue")
     public ResponseEntity<CardAccount> issueCard(@RequestParam Long customerId,
                                                  @RequestParam Long productId,
-                                                 @RequestParam Double creditLimit) {
+                                                 @RequestParam Double creditLimit,
+                                                 @RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(
-                cardIssuanceService.issueCard(customerId, productId, creditLimit)
+                cardIssuanceService.issueCard(customerId, productId, creditLimit, token)
         );
     }
 

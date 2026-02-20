@@ -1,27 +1,36 @@
-
 package com.CardMaster.mapper.cias;
 
 import com.CardMaster.model.cias.CardAccount;
 import com.CardMaster.Enum.cias.AccountStatus;
 import com.CardMaster.dto.cias.CardAccountRequestDto;
 import com.CardMaster.dto.cias.CardAccountResponseDto;
-import com.CardMaster.dto.cias.CardResponseDto;
+import com.CardMaster.model.cias.Card;
+import com.CardMaster.dao.cias.CardRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
+@RequiredArgsConstructor
 public class CardAccountMapper {
 
-    public static CardAccount toEntity(CardAccountRequestDto dto) {
+    private final CardRepository cardRepository;
+
+    public CardAccount toEntity(CardAccountRequestDto dto) {
+        Card card = cardRepository.findById(dto.getCardId())
+                .orElseThrow(() -> new IllegalArgumentException("Card not found with ID: " + dto.getCardId()));
+
         CardAccount account = new CardAccount();
-        account.setCardId(dto.getCardId());
+        account.setCard(card);
         account.setCreditLimit(dto.getCreditLimit());
         account.setAvailableLimit(dto.getAvailableLimit());
-        account.setStatus(AccountStatus.Status.valueOf(dto.getStatus().toUpperCase()));
+        account.setStatus(AccountStatus.valueOf(dto.getStatus().toUpperCase()));
         return account;
     }
 
-    public static CardAccountResponseDto toDTO(CardAccount account) {
+    public CardAccountResponseDto toDTO(CardAccount account) {
         CardAccountResponseDto dto = new CardAccountResponseDto();
         dto.setAccountId(account.getAccountId());
-        dto.setCardId(account.getCardId());
+        dto.setCardId(account.getCard().getCardId());
         dto.setCreditLimit(account.getCreditLimit());
         dto.setAvailableLimit(account.getAvailableLimit());
         dto.setOpenDate(account.getOpenDate());

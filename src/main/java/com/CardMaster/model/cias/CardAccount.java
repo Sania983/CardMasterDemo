@@ -1,6 +1,7 @@
 package com.CardMaster.model.cias;
 
 import com.CardMaster.model.cias.Card;
+import com.CardMaster.Enum.cias.AccountStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

@@ -4,9 +4,11 @@ import com.CardMaster.Enum.cpl.CardCategory;
 import com.CardMaster.Enum.cpl.ProductStatus;
 import jakarta.persistence.*;
 import jdk.jfr.DataAmount;
+import lombok.Data;
 
 import java.math.BigDecimal;
 
+@Data
 @Entity
 @Table(name = "card_product")
 @Access(AccessType.FIELD)

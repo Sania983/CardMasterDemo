@@ -1,10 +1,11 @@
 package com.CardMaster.service.cias;
 
-import com.CardMaster.exception.AccountSetupException;
+import com.CardMaster.Enum.cias.AccountStatus;
 import com.CardMaster.model.cias.CardAccount;
 import com.CardMaster.dao.cias.CardAccountRepository;
 import com.CardMaster.security.iam.JwtUtil; // assuming you have this utility
 import lombok.RequiredArgsConstructor;
+import com.CardMaster.exceptions.cias.AccountSetupException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,7 +19,7 @@ public class AccountSetupService {
     private final JwtUtil jwtUtil;
 
     // Create a new account with JWT validation
-    public CardAccount createAccount(CardAccount account, String token) {
+    public CardAccount createAccount(CardAccount account,String token) {
         // Validate JWT
         jwtUtil.extractUsername(token.substring(7));
 
@@ -27,7 +28,7 @@ public class AccountSetupService {
         }
         account.setAvailableLimit(account.getCreditLimit());
         account.setOpenDate(LocalDate.now());
-        account.setStatus(CardAccount.Status.Active);
+        account.setStatus(AccountStatus.ACTIVE);
         return accountRepository.save(account);
     }
 
