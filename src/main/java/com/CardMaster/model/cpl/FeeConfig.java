@@ -22,7 +22,7 @@ public class FeeConfig {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
-    private com.CardMaster.Entity.CardProduct product;   // ✅ keep name as 'product'
+    private com.CardMaster.model.cpl.CardProduct product;   // ✅ keep name as 'product'
 
     @Enumerated(EnumType.STRING)
     @Column(name = "fee_type", nullable = false, length = 20)

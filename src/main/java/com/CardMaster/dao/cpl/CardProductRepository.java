@@ -1,12 +1,6 @@
 package com.CardMaster.dao.cpl;
 
-import com.CardMaster.Entity.CardProduct;
-import com.CardMaster.Enum.ProductStatus;
+import com.CardMaster.model.cpl.CardProduct;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
-public interface CardProductRepository extends JpaRepository<CardProduct, Long> {
-
-    List<CardProduct> findByStatus(ProductStatus status);
-}
+public interface CardProductRepository extends JpaRepository<CardProduct, Long> {}

@@ -1,8 +1,8 @@
 package com.CardMaster.controller.cpl;
 
-import com.CardMaster.model.cpl.CardProduct;
+import com.CardMaster.dto.cpl.CardProductRequestDto;
+import com.CardMaster.dto.cpl.CardProductResponseDto;
 import com.CardMaster.service.cpl.CardProductService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,15 +14,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CardProductController {
 
-    private final CardProductService productService;
+    private final CardProductService service;
 
     @PostMapping
-    public ResponseEntity<CardProduct> create(@Valid @RequestBody CardProduct product) {
-        return ResponseEntity.ok(productService.create(product));
+    public ResponseEntity<CardProductResponseDto> create(@RequestBody CardProductRequestDto request) {
+        // Controller passes exactly 1 argument to service.create(...)
+        return ResponseEntity.ok(service.create(request));
     }
 
     @GetMapping
-    public ResponseEntity<List<CardProduct>> list() {
-        return ResponseEntity.ok(productService.findAll());
+    public ResponseEntity<List<CardProductResponseDto>> list() {
+        return ResponseEntity.ok(service.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CardProductResponseDto> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findById(id));
     }
 }
