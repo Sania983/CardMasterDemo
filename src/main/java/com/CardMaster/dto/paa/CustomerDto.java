@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class CustomerDto {
 
+
         private Long customerId;
         private String name;
         private String dob;            // could be LocalDate if preferred
