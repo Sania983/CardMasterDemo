@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/db9
     username: root
-    password: Harsha@28
+    password: TIGER
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -12,7 +12,7 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       # dbl-auto: update
-      ddl-auto: create
+      ddl-auto: update
 
 server:
   port: 8082
