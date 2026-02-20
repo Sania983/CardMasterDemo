@@ -1,11 +1,20 @@
 package com.CardMaster.model.paa;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDate;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +27,11 @@ public class Document {
     @Enumerated(EnumType.STRING)
     private DocumentType documentType;
 
+    @NotBlank
+
     private String fileURI;
+
+    @CreationTimestamp
     private LocalDate uploadedDate;
 
     @Enumerated(EnumType.STRING)

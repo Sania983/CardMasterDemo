@@ -3,13 +3,14 @@ package com.CardMaster.mapper.paa;
 import com.CardMaster.dto.paa.CustomerDto;
 import com.CardMaster.dto.paa.CardApplicationDto;
 import com.CardMaster.dto.paa.DocumentDto;
+import com.CardMaster.model.cpl.CardProduct;
 import com.CardMaster.model.paa.Customer;
 import com.CardMaster.model.paa.CardApplication;
 import com.CardMaster.model.paa.Document;
 
 public class EntityMapper {
 
-    // --- Customer --- converting Customer to CustomerDto
+    // --- Customer ---
     public static CustomerDto toCustomerDto(Customer customer) {
         CustomerDto dto = new CustomerDto();
         dto.setCustomerId(customer.getCustomerId());
@@ -39,18 +40,19 @@ public class EntityMapper {
         CardApplicationDto dto = new CardApplicationDto();
         dto.setApplicationId(app.getApplicationId());
         dto.setCustomerId(app.getCustomer().getCustomerId());
-        dto.setProductId(app.getProductId());
+        dto.setProductId(app.getProduct().getProductId());
         dto.setRequestedLimit(app.getRequestedLimit());
         dto.setApplicationDate(app.getApplicationDate());
         dto.setStatus(app.getStatus().name());
         return dto;
     }
 
-    public static CardApplication toCardApplicationEntity(CardApplicationDto dto, Customer customer) {
+    // Here we pass in the actual Customer and CardProduct entities
+    public static CardApplication toCardApplicationEntity(CardApplicationDto dto, Customer customer, CardProduct product) {
         CardApplication app = new CardApplication();
         app.setApplicationId(dto.getApplicationId());
         app.setCustomer(customer);
-        app.setProductId(dto.getProductId());
+        app.setProduct(product);
         app.setRequestedLimit(dto.getRequestedLimit());
         app.setApplicationDate(dto.getApplicationDate());
         app.setStatus(CardApplication.CardApplicationStatus.valueOf(dto.getStatus()));

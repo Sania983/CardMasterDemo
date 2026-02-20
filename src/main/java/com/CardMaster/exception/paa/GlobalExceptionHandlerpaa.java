@@ -1,5 +1,6 @@
-package com.CardMaster.exceptions.paa;
+package com.CardMaster.exception.paa;
 
+import com.CardMaster.exceptions.paa.ApplicationNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

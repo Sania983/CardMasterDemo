@@ -12,7 +12,7 @@ public class AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
 
-    // ✅ Constructor injection
+
     public AuditLogService(AuditLogRepository auditLogRepository) {
         this.auditLogRepository = auditLogRepository;
     }
