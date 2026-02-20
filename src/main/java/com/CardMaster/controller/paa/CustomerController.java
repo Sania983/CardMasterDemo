@@ -2,42 +2,56 @@ package com.CardMaster.controller.paa;
 
 import com.CardMaster.dto.paa.CustomerDto;
 import com.CardMaster.service.paa.CustomerService;
+import com.CardMaster.dto.paa.ResponseStructure; // <-- create this utility class
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/customers")
-public class
-CustomerController {
+@RequiredArgsConstructor
+public class CustomerController {
+
     private final CustomerService service;
 
-    public CustomerController(CustomerService service) {
-        this.service = service;
-    }
-
+    // --- Create Customer ---
     @PostMapping
-    public CustomerDto createCustomer(@RequestBody CustomerDto dto) {
-        return service.createCustomer(dto);
+    public ResponseEntity<ResponseStructure<CustomerDto>> createCustomer(@Valid @RequestBody CustomerDto dto) {
+        CustomerDto created = service.createCustomer(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ResponseStructure<>("Customer created successfully", created));
     }
 
+    // --- Get Customer by ID ---
     @GetMapping("/{id}")
-    public CustomerDto getCustomer(@PathVariable Long id) {
-        return service.getCustomer(id);
+    public ResponseEntity<ResponseStructure<CustomerDto>> getCustomer(@PathVariable Long id) {
+        CustomerDto customer = service.getCustomer(id);
+        return ResponseEntity.ok(new ResponseStructure<>("Customer retrieved successfully", customer));
     }
 
+    // --- Update Customer ---
     @PutMapping("/{id}")
-    public CustomerDto updateCustomer(@PathVariable Long id, @RequestBody CustomerDto dto) {
-        return service.updateCustomer(id, dto);
+    public ResponseEntity<ResponseStructure<CustomerDto>> updateCustomer(@PathVariable Long id,
+                                                                         @Valid @RequestBody CustomerDto dto) {
+        CustomerDto updated = service.updateCustomer(id, dto);
+        return ResponseEntity.ok(new ResponseStructure<>("Customer updated successfully", updated));
     }
 
+    // --- Delete Customer ---
     @DeleteMapping("/{id}")
-    public void deleteCustomer(@PathVariable Long id) {
+    public ResponseEntity<ResponseStructure<Void>> deleteCustomer(@PathVariable Long id) {
         service.deleteCustomer(id);
+        return ResponseEntity.ok(new ResponseStructure<>("Customer deleted successfully", null));
     }
 
+    // --- Get All Customers ---
     @GetMapping
-    public List<CustomerDto> getAllCustomers() {
-        return service.getAllCustomers();
+    public ResponseEntity<ResponseStructure<List<CustomerDto>>> getAllCustomers() {
+        List<CustomerDto> customers = service.getAllCustomers();
+        return ResponseEntity.ok(new ResponseStructure<>("Customers retrieved successfully", customers));
     }
 }

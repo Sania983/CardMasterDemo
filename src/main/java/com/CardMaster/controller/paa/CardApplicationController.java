@@ -1,54 +1,56 @@
 package com.CardMaster.controller.paa;
 
 import com.CardMaster.dto.paa.CardApplicationDto;
-import com.CardMaster.model.paa.CardApplication;
-import com.CardMaster.dao.paa.CardApplicationRepository;
 import com.CardMaster.service.paa.CardApplicationService;
+import com.CardMaster.dto.paa.ResponseStructure;
+import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/applications")
+@RequiredArgsConstructor
 public class CardApplicationController {
-    private final CardApplicationService service;
-    private final CardApplicationRepository applicationRepo;
 
-    public CardApplicationController(CardApplicationService service,
-                                     CardApplicationRepository applicationRepo) {
-        this.service = service;
-        this.applicationRepo = applicationRepo;
-    }
+    private static final Logger log = LogManager.getLogger(CardApplicationController.class);
+    private final CardApplicationService applicationService;
 
-    // New endpoint: create application with just a requested limit
-    @PostMapping("/create-app/{limit}")
-    public Long createApplication(@PathVariable double limit) {
-        CardApplication app = new CardApplication();
-        app.setRequestedLimit(limit);
-        app.setApplicationDate(LocalDate.now());
-        app.setStatus(CardApplication.CardApplicationStatus.Submitted);
-        app = applicationRepo.save(app);
-        return app.getApplicationId();
-    }
-
+    // --- Submit Application ---
     @PostMapping
-    public CardApplicationDto submitApplication(@RequestBody CardApplicationDto dto) {
-        return service.submitApplication(dto);
+    public ResponseEntity<ResponseStructure<CardApplicationDto>> submit(@Valid @RequestBody CardApplicationDto dto) {
+        log.info("Submitting card application");
+        CardApplicationDto saved = applicationService.submit(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ResponseStructure<>("Application submitted successfully", saved));
     }
 
+    // --- Get Application by ID ---
     @GetMapping("/{id}")
-    public CardApplicationDto getApplication(@PathVariable Long id) {
-        return service.getApplication(id);
+    public ResponseEntity<ResponseStructure<CardApplicationDto>> getById(@PathVariable Long id) {
+        log.info("Fetching application {}", id);
+        CardApplicationDto dto = applicationService.findById(id);
+        return ResponseEntity.ok(new ResponseStructure<>("Application retrieved successfully", dto));
     }
 
-    @GetMapping("/customer/{customerId}")
-    public List<CardApplicationDto> getApplicationsByCustomer(@PathVariable Long customerId) {
-        return service.getApplicationsByCustomer(customerId);
+    // --- Get All Applications ---
+    @GetMapping
+    public ResponseEntity<ResponseStructure<List<CardApplicationDto>>> getAllApplications() {
+        log.info("Fetching all applications");
+        List<CardApplicationDto> apps = applicationService.getAllApplications();
+        return ResponseEntity.ok(new ResponseStructure<>("All applications retrieved successfully", apps));
     }
 
-    @PutMapping("/{id}/status")
-    public CardApplicationDto updateStatus(@PathVariable Long id, @RequestParam String status) {
-        return service.updateApplicationStatus(id, status);
+    // --- Delete Application ---
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseStructure<Void>> deleteApplication(@PathVariable Long id) {
+        log.info("Deleting application {}", id);
+        applicationService.deleteApplication(id);
+        return ResponseEntity.ok(new ResponseStructure<>("Application deleted successfully", null));
     }
 }

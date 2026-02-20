@@ -1,4 +1,4 @@
-package com.CardMaster.exceptions.paa;
+package com.CardMaster.exception.paa;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

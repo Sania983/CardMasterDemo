@@ -13,19 +13,15 @@ import java.util.List;
 @Service
 public class UserService {
 
-<<<<<<< HEAD
+
+
+
     private final UserRepository1 userRepository1;
     private final AuditLogRepository auditLogRepository;
 
-    public UserService(UserRepository1 userRepository1, AuditLogRepository auditLogRepository) {
+    public UserService(UserRepository1 userRepository1, UserRepository1 userRepository, AuditLogRepository auditLogRepository) {
         this.userRepository1 = userRepository1;
-=======
-    private final UserRepository1 userRepository;
-    private final AuditLogRepository auditLogRepository;
 
-    public UserService(UserRepository1 userRepository, AuditLogRepository auditLogRepository) {
-        this.userRepository = userRepository;
->>>>>>> a00d10876ff491ab6fcb306786044d10ea80011d
         this.auditLogRepository = auditLogRepository;
     }
 

@@ -1,10 +1,6 @@
-package com.CardMaster.exceptions.paa;
+package com.CardMaster.exception.paa;
 
 public class DocumentNotFoundException extends RuntimeException {
-    public DocumentNotFoundException(Long id) {
-        super("Document not found with id: " + id);
-    }
-
     public DocumentNotFoundException(String message) {
         super(message);
     }
