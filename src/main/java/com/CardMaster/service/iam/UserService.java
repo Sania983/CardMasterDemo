@@ -1,74 +1,66 @@
 package com.CardMaster.service.iam;
 
+import com.CardMaster.dao.iam.UserRepository;
 import com.CardMaster.dao.iam.AuditLogRepository;
-import com.CardMaster.dao.iam.UserRepository1;
-import com.CardMaster.exception.iam.InvalidCredentialsException;
-import com.CardMaster.exception.iam.UserNotFoundException;
+import com.CardMaster.dto.iam.UserDto;
+import com.CardMaster.exceptions.iam.InvalidCredentialsException;
+import com.CardMaster.exceptions.iam.UserNotFoundException;
+import com.CardMaster.mapper.iam.UserMapper;
 import com.CardMaster.model.iam.AuditLog;
 import com.CardMaster.model.iam.User;
+import com.CardMaster.security.iam.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-
-
-
-    private final UserRepository1 userRepository1;
+    private final UserRepository userRepository;
     private final AuditLogRepository auditLogRepository;
-
-    public UserService(UserRepository1 userRepository1, UserRepository1 userRepository, AuditLogRepository auditLogRepository) {
-        this.userRepository1 = userRepository1;
-
-        this.auditLogRepository = auditLogRepository;
-    }
+    private final JwtUtil jwtUtil;
 
     // Get all users
-    public List<User> getAllUsers() {
-        return userRepository1.findAll();
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::toDto)
+                .toList();
     }
 
     // Get user by ID
     public User getUserById(Long userId) {
-        User user = userRepository1.findById(userId).orElse(null);
-        if (user == null) {
-            throw new UserNotFoundException(userId);
-        }
-        return user;
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     // Register new user
     public User registerUser(User user) {
-        User savedUser = userRepository1.save(user);
+        User savedUser = userRepository.save(user);
         logAction(savedUser, "REGISTER", "User Registration");
         return savedUser;
     }
 
-    // Login user by ID and password
-    public User loginUser(Long userId, String name) {
-        User user = userRepository1.findById(userId).orElse(null);
-        if (user == null) {
-            throw new UserNotFoundException(userId);
-        }
+    // Login user by ID + password
+    public String loginUser(Long userId, String password) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
-        if (!user.getName().equals(name)) {
+        if (!user.getPassword().equals(password)) {
             logAction(user, "LOGIN_FAILED", "Invalid credentials");
             throw new InvalidCredentialsException();
         }
 
         logAction(user, "LOGIN", "User Login");
-        return user;
+        return jwtUtil.generateToken(user.getUserId().toString());
     }
 
     // Logout user
     public void logoutUser(Long userId) {
-        User user = userRepository1.findById(userId).orElse(null);
-        if (user == null) {
-            throw new UserNotFoundException(userId);
-        }
-
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
         logAction(user, "LOGOUT", "User Logout");
     }
 
