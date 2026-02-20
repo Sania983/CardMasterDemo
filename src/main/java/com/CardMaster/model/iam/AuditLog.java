@@ -31,7 +31,6 @@ public class AuditLog {
     @NotBlank
     private String resource;
 
-    @NotNull
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime timestamp;
