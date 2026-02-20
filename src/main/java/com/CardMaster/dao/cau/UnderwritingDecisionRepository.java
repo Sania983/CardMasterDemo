@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface UnderwritingDecisionRepository extends JpaRepository<UnderwritingDecision, Long> {
 
-    Optional<UnderwritingDecision> findTopByApplication_ApplicationIdOrderByDecisionDateDesc(Long applicationId);
+    Optional<UnderwritingDecision> findTopByApplicationid_ApplicationIdOrderByDecisionDateDesc(Long applicationId);
 }
