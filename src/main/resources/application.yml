@@ -12,7 +12,7 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       # dbl-auto: update
-      ddl-auto: create
+      ddl-auto: update
 
 server:
   port: 8082
