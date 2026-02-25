@@ -1,4 +1,4 @@
-package com.CardMaster.exception;
+package com.CardMaster.exceptions.cpl;
 
 public class UnauthorizedActionException extends RuntimeException {
     public UnauthorizedActionException(String message) { super(message); }
