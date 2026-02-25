@@ -1,8 +1,8 @@
 package com.CardMaster.controller.paa;
 
 import com.CardMaster.dto.paa.CardApplicationDto;
-import com.CardMaster.service.paa.CardApplicationService;
 import com.CardMaster.dto.paa.ResponseStructure;
+import com.CardMaster.service.paa.CardApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,7 +27,7 @@ public class CardApplicationController {
             @Valid @RequestBody CardApplicationDto dto,
             @RequestHeader("Authorization") String token) {
 
-        log.info("Creating card application");
+        log.info("Creating card application for customer {}", dto.getCustomerId());
         CardApplicationDto saved = applicationService.create(dto, token);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ResponseStructure<>("Application created successfully", saved));
@@ -52,6 +52,29 @@ public class CardApplicationController {
         log.info("Fetching all applications");
         List<CardApplicationDto> apps = applicationService.getAllApplications(token);
         return ResponseEntity.ok(new ResponseStructure<>("All applications retrieved successfully", apps));
+    }
+
+    // --- Get Applications by Customer ---
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<ResponseStructure<List<CardApplicationDto>>> getByCustomer(
+            @PathVariable Long customerId,
+            @RequestHeader("Authorization") String token) {
+
+        log.info("Fetching applications for customer {}", customerId);
+        List<CardApplicationDto> apps = applicationService.getApplicationsByCustomer(customerId, token);
+        return ResponseEntity.ok(new ResponseStructure<>("Applications retrieved successfully", apps));
+    }
+
+    // --- Update Application Status ---
+    @PutMapping("/{id}/status")
+    public ResponseEntity<ResponseStructure<CardApplicationDto>> updateStatus(
+            @PathVariable Long id,
+            @RequestParam String status,
+            @RequestHeader("Authorization") String token) {
+
+        log.info("Updating status for application {} to {}", id, status);
+        CardApplicationDto updated = applicationService.updateApplicationStatus(id, status, token);
+        return ResponseEntity.ok(new ResponseStructure<>("Application status updated successfully", updated));
     }
 
     // --- Delete Application ---
