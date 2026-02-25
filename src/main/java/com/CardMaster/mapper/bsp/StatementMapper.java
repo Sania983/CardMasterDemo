@@ -1,17 +1,26 @@
-package com.CardMaster.mapper.billing;
+package com.CardMaster.mapper.bsp;
 
-import com.CardMaster.dto.billing.StatementRequestDto;
-import com.CardMaster.dto.billing.StatementResponseDto;
-import com.CardMaster.model.billing.Statement;
-import com.CardMaster.model.billing.StatementStatus;
+import com.CardMaster.dto.bsp.StatementDto;
+import com.CardMaster.model.bsp.Statement;
+import com.CardMaster.Enum.bsp.StatementStatus;
+import com.CardMaster.model.cias.CardAccount;
+import com.CardMaster.dao.cias.CardAccountRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class StatementMapper {
 
-    public Statement toEntity(StatementRequestDto dto) {
+    private final CardAccountRepository accountRepository;
+
+    // DTO → Entity
+    public Statement toEntity(StatementDto dto) {
+        CardAccount account = accountRepository.findById(dto.getAccountId())
+                .orElseThrow(() -> new IllegalArgumentException("Account not found with ID: " + dto.getAccountId()));
+
         Statement st = new Statement();
-        st.setAccountId(dto.getAccountId());
+        st.setAccountId(account);
         st.setPeriodStart(dto.getPeriodStart());
         st.setPeriodEnd(dto.getPeriodEnd());
         st.setTotalDue(dto.getTotalDue());
@@ -21,10 +30,11 @@ public class StatementMapper {
         return st;
     }
 
-    public StatementResponseDto toDTO(Statement st) {
-        StatementResponseDto dto = new StatementResponseDto();
+    // Entity → DTO
+    public StatementDto toDTO(Statement st) {
+        StatementDto dto = new StatementDto();
         dto.setStatementId(st.getStatementId());
-        dto.setAccountId(st.getAccountId());
+        dto.setAccountId(st.getAccountId().getAccountId()); // extract ID from CardAccount
         dto.setPeriodStart(st.getPeriodStart());
         dto.setPeriodEnd(st.getPeriodEnd());
         dto.setTotalDue(st.getTotalDue());

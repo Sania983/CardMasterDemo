@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionHoldResponseDto {
+public class TransactionHoldDto {
     private Long holdId;
     private Long transactionId;
     private Double amount;

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StatementResponseDto {
+public class StatementDto {
     private Long statementId;
     private Long accountId;
     private LocalDate periodStart;

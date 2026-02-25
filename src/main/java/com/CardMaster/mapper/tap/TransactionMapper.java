@@ -1,31 +1,39 @@
 package com.CardMaster.mapper.tap;
 
-import com.CardMaster.dto.transactions.TransactionRequestDto;
-import com.CardMaster.dto.transactions.TransactionResponseDto;
-import com.CardMaster.model.transactions.Transaction;
-import com.CardMaster.model.transactions.Channel;
-import com.CardMaster.model.transactions.TransactionStatus;
+import com.CardMaster.dto.tap.TransactionDto;
+import com.CardMaster.model.tap.Transaction;
+import com.CardMaster.model.cias.CardAccount;
+import com.CardMaster.dao.cias.CardAccountRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class TransactionMapper {
 
-    public Transaction toEntity(TransactionRequestDto dto) {
+    private final CardAccountRepository accountRepository;
+
+    // DTO → Entity
+    public Transaction toEntity(TransactionDto dto) {
+        CardAccount account = accountRepository.findById(dto.getAccountId())
+                .orElseThrow(() -> new IllegalArgumentException("Account not found with ID: " + dto.getAccountId()));
+
         Transaction tx = new Transaction();
-        tx.setAccountId(dto.getAccountId());
+        tx.setAccountId(account);
         tx.setAmount(dto.getAmount());
         tx.setCurrency(dto.getCurrency());
         tx.setMerchant(dto.getMerchant());
-        tx.setChannel(Channel.valueOf(dto.getChannel().name()));
+        tx.setChannel(dto.getChannel());
         tx.setTransactionDate(dto.getTransactionDate());
-        tx.setStatus(TransactionStatus.valueOf(dto.getStatus().name()));
+        tx.setStatus(dto.getStatus());
         return tx;
     }
 
-    public TransactionResponseDto toDTO(Transaction tx) {
-        TransactionResponseDto dto = new TransactionResponseDto();
+    // Entity → DTO
+    public TransactionDto toDTO(Transaction tx) {
+        TransactionDto dto = new TransactionDto();
         dto.setTransactionId(tx.getTransactionId());
-        dto.setAccountId(tx.getAccountId());
+        dto.setAccountId(tx.getAccountId().getAccountId()); // extract ID from CardAccount
         dto.setAmount(tx.getAmount());
         dto.setCurrency(tx.getCurrency());
         dto.setMerchant(tx.getMerchant());
