@@ -1,23 +1,18 @@
 package com.CardMaster.dto.tap;
 
-import com.CardMaster.model.transactions.Channel;
-import com.CardMaster.model.transactions.TransactionStatus;
+import com.CardMaster.Enum.tap.Channel;
+import com.CardMaster.Enum.tap.TransactionStatus;
 import lombok.Data;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
-public class TransactionRequestDto {
-    private Long accountId;
-    private Double amount;
-    private String currency;
-    private String merchant;
-    private Channel channel;
-    private LocalDateTime transactionDate;
-    private TransactionStatus status;
-}
-
-@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TransactionResponseDto {
     private Long transactionId;
     private Long accountId;

@@ -4,29 +4,22 @@ import com.CardMaster.dao.cau.CreditScoreRepository;
 import com.CardMaster.dao.cau.UnderwritingDecisionRepository;
 import com.CardMaster.dao.iam.UserRepository;
 import com.CardMaster.dao.paa.CardApplicationRepository;
-
 import com.CardMaster.dto.cau.CreditScoreGenerateRequest;
 import com.CardMaster.dto.cau.UnderwritingDecisionRequest;
-
 import com.CardMaster.exceptions.cau.EntityNotFoundException;
 import com.CardMaster.exceptions.cau.ValidationException;
-
 import com.CardMaster.model.cau.CreditScore;
 import com.CardMaster.model.cau.UnderwritingDecision;
 import com.CardMaster.model.iam.User;
 import com.CardMaster.model.paa.CardApplication;
 import com.CardMaster.Enum.cau.UnderwritingDecisionType;
 import com.CardMaster.model.paa.CardApplication.CardApplicationStatus;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 public class UnderwritingService {
-
     private final CreditScoreRepository creditScoreRepository;
     private final UnderwritingDecisionRepository decisionRepository;
     private final CardApplicationRepository applicationRepository;
