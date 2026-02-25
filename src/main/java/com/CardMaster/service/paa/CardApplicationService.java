@@ -3,6 +3,7 @@ package com.CardMaster.service.paa;
 import com.CardMaster.dao.cpl.CardProductRepository;
 import com.CardMaster.dao.paa.CardApplicationRepository;
 import com.CardMaster.dao.paa.CustomerRepository;
+import com.CardMaster.dao.paa.DocumentRepository;
 import com.CardMaster.dto.paa.CardApplicationDto;
 import com.CardMaster.exception.paa.ApplicationNotFoundException;
 import com.CardMaster.exception.paa.CustomerNotFoundException;
@@ -11,6 +12,7 @@ import com.CardMaster.mapper.paa.EntityMapper;
 import com.CardMaster.model.cpl.CardProduct;
 import com.CardMaster.model.paa.CardApplication;
 import com.CardMaster.model.paa.Customer;
+import com.CardMaster.model.paa.Document;
 import com.CardMaster.security.iam.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,22 +22,35 @@ import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
-public class CardApplicationService {
+public class
+CardApplicationService {
 
     private final CardApplicationRepository applicationRepository;
     private final CustomerRepository customerRepository;
     private final CardProductRepository productRepo;
+    private final DocumentRepository documentRepository;
     private final JwtUtil jwtUtil;
 
-    // --- Create Application (initially Submitted) ---
+    // --- Create Application ---
     public CardApplicationDto create(CardApplicationDto dto, String token) {
         jwtUtil.extractUsername(token.substring(7)); // validate token
 
         Customer customer = customerRepository.findById(dto.getCustomerId())
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + dto.getCustomerId()));
 
-        CardProduct product = productRepo.findById(dto.getProductId()) .orElseThrow(() -> new NotFoundException("Product not found"));
-        CardApplication application = EntityMapper.toCardApplicationEntity(dto, customer,product);
+
+        List<CardApplication> existingApps = applicationRepository.findByCustomerCustomerId(dto.getCustomerId());
+        boolean hasActive = existingApps.stream()
+                .anyMatch(app -> app.getStatus() == CardApplication.CardApplicationStatus.Submitted
+                        || app.getStatus() == CardApplication.CardApplicationStatus.Approved);
+        if (hasActive) {
+            throw new ApplicationNotFoundException("Customer already has an active application. Only one allowed.");
+        }
+
+        CardProduct product = productRepo.findById(dto.getProductId())
+                .orElseThrow(() -> new NotFoundException("Product not found"));
+
+        CardApplication application = EntityMapper.toCardApplicationEntity(dto, customer, product);
         application.setStatus(CardApplication.CardApplicationStatus.Submitted);
 
         CardApplication saved = applicationRepository.save(application);
@@ -61,6 +76,42 @@ public class CardApplicationService {
             dtos.add(EntityMapper.toCardApplicationDto(app));
         }
         return dtos;
+    }
+
+    // --- Get Applications by Customer ---
+    public List<CardApplicationDto> getApplicationsByCustomer(Long customerId, String token) {
+        jwtUtil.extractUsername(token.substring(7)); // validate token
+
+        List<CardApplication> apps = applicationRepository.findByCustomerCustomerId(customerId);
+        List<CardApplicationDto> dtos = new ArrayList<>();
+        for (CardApplication app : apps) {
+            dtos.add(EntityMapper.toCardApplicationDto(app));
+        }
+        return dtos;
+    }
+
+    // --- Update Application Status ---
+    public CardApplicationDto updateApplicationStatus(Long id, String status, String token) {
+        jwtUtil.extractUsername(token.substring(7)); // validate token
+
+        CardApplication app = applicationRepository.findById(id)
+                .orElseThrow(() -> new ApplicationNotFoundException("Application not found with id: " + id));
+
+        try {
+            app.setStatus(CardApplication.CardApplicationStatus.valueOf(status.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new ApplicationNotFoundException("Invalid status value: " + status);
+        }
+
+        List<Document> docs = documentRepository.findByApplicationApplicationId(id);
+        boolean hasRejectedDoc = docs.stream()
+                .anyMatch(doc -> doc.getStatus() == Document.DocumentStatus.Rejected);
+        if (hasRejectedDoc) {
+            app.setStatus(CardApplication.CardApplicationStatus.Rejected);
+        }
+
+        CardApplication updated = applicationRepository.save(app);
+        return EntityMapper.toCardApplicationDto(updated);
     }
 
     // --- Delete Application ---

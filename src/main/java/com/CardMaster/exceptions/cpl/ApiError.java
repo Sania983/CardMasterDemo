@@ -1,4 +1,4 @@
-package com.CardMaster.exception.cpl;
+package com.CardMaster.exceptions.cpl;
 
 import java.time.OffsetDateTime;
 import org.springframework.http.HttpStatus;
