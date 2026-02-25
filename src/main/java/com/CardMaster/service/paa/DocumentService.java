@@ -59,7 +59,7 @@ public class DocumentService {
                 .orElseThrow(() -> new DocumentNotFoundException("Document not found with id: " + id));
 
         try {
-            doc.setStatus(Document.DocumentStatus.valueOf(status.toUpperCase()));
+            doc.setStatus(Document.DocumentStatus.valueOf(status));
         } catch (IllegalArgumentException e) {
             throw new DocumentNotFoundException("Invalid status value: " + status);
         }

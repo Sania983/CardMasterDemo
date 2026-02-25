@@ -22,7 +22,8 @@ import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
-public class CardApplicationService {
+public class
+CardApplicationService {
 
     private final CardApplicationRepository applicationRepository;
     private final CustomerRepository customerRepository;
@@ -102,7 +103,6 @@ public class CardApplicationService {
             throw new ApplicationNotFoundException("Invalid status value: " + status);
         }
 
-        // ✅ Cascade Rule: If any document is rejected, mark application as rejected
         List<Document> docs = documentRepository.findByApplicationApplicationId(id);
         boolean hasRejectedDoc = docs.stream()
                 .anyMatch(doc -> doc.getStatus() == Document.DocumentStatus.Rejected);
