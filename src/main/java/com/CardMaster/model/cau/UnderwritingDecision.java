@@ -4,6 +4,7 @@ import com.CardMaster.model.iam.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,7 +36,7 @@ public class UnderwritingDecision {
     @NotNull
     @Enumerated(EnumType.STRING)
     private UnderwritingDecisionType decision;
-    @Positive
+    @PositiveOrZero
     private Double approvedLimit;
     private String remarks;
     @NotNull   //space is allowed
