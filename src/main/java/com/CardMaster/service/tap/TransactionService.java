@@ -1,9 +1,9 @@
 package com.CardMaster.service.tap;
 
-import com.CardMaster.dao.accounts.CardAccountRepository;
+import com.CardMaster.dao.tap.CardAccountRepository;
 import com.CardMaster.dao.tap.TransactionHoldRepository;
 import com.CardMaster.dao.tap.TransactionRepository;
-import com.CardMaster.exceptions.ResourceNotFoundException; // keep if you already use this elsewhere
+import com.CardMaster.exceptions.tap.ResourceNotFoundException; // keep if you already use this elsewhere
 import com.CardMaster.exceptions.tap.InsufficientLimitException;
 import com.CardMaster.exceptions.tap.TransactionNotFoundException;
 import com.CardMaster.model.accounts.CardAccount;
