@@ -9,7 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true) // ✅ enables @PreAuthorize / @PostAuthorize
+@EnableMethodSecurity(prePostEnabled = true) // enables @PreAuthorize / @PostAuthorize
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
@@ -26,7 +26,7 @@ public class SecurityConfig {
                         .requestMatchers("/users/register", "/users/login").permitAll() // public endpoints
                         .anyRequest().authenticated() // everything else requires authentication
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // ✅ add JWT filter
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); //  add JWT filter
 
         return http.build();
     }
