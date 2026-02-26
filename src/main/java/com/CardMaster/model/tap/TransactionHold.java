@@ -6,6 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import com.CardMaster.model.tap.Transaction;
 
+
 @Entity
 @Table(name = "transaction_holds")
 @Data

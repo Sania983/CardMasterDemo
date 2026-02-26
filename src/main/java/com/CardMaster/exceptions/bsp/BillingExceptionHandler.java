@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice(basePackages = "com.CardMaster.controller.billing")
 public class BillingExceptionHandler {
 
+
     @ExceptionHandler(StatementNotFoundException.class)
     public ResponseEntity<String> handleStatementNotFound(StatementNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());

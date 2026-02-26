@@ -8,6 +8,7 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.util.List;
 
+
 @Entity
 @Table(name = "statements")
 @Data
