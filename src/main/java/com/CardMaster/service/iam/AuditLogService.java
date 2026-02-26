@@ -4,39 +4,52 @@ import com.CardMaster.dao.iam.AuditLogRepository;
 import com.CardMaster.dao.iam.UserRepository;
 import com.CardMaster.model.iam.AuditLog;
 import com.CardMaster.model.iam.User;
+import com.CardMaster.exceptions.iam.UserNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
     private final UserRepository userRepository;
 
-    public AuditLogService(AuditLogRepository auditLogRepository, UserRepository userRepository) {
-        this.auditLogRepository = auditLogRepository;
-        this.userRepository = userRepository;
+    public List<AuditLog> getAllLogs() {
+        return auditLogRepository.findAll();
     }
-    public List<AuditLog> getAllLogs() { return auditLogRepository.findAll(); }
-
-    // Log usin
-    // g a User entity
-    public void log(User user, String action, String resource) {
+    /**
+     * Log an action by resolving the User entity from either userId or email.
+     */
+    public void log(String identifier, String action, String resource) {
         AuditLog log = new AuditLog();
-        log.setUser(user);
+
+        User user = resolveUser(identifier);
+        if (user != null) {
+            log.setUser(user);
+            log.setMetadata("Performed by " + user.getName());
+        } else {
+            log.setUser(null);
+            log.setMetadata("Performed by " + identifier);
+        }
+
         log.setAction(action);
         log.setResource(resource);
-        log.setMetadata("Performed by " + user.getName());
-        log.setTimestamp(LocalDateTime.now());
+
         auditLogRepository.save(log);
     }
 
-    // Convenience method: log by email (resolves User first)
-    public void log(String email, String action, String resource) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
-        log(user, action, resource);
+    private User resolveUser(String identifier) {
+        try {
+            // If identifier is numeric, treat it as userId
+            Long userId = Long.parseLong(identifier);
+            return userRepository.findById(userId).orElse(null);
+        } catch (NumberFormatException e) {
+            // Otherwise, treat identifier as email
+            return userRepository.findByEmail(identifier).orElse(null);
+        }
     }
+
 }
