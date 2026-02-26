@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreditScoreGenerateRequest {
-    @Positive
+    @Positive(message = "Bureau score must be positive")
     private Integer bureauScore;
 
 

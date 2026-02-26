@@ -1,4 +1,3 @@
-
 package com.CardMaster.dao.cau;
 
 import com.CardMaster.model.cau.UnderwritingDecision;
@@ -8,5 +7,6 @@ import java.util.Optional;
 
 public interface UnderwritingDecisionRepository extends JpaRepository<UnderwritingDecision, Long> {
 
-    Optional<UnderwritingDecision> findTopByApplicationid_ApplicationIdOrderByDecisionDateDesc(Long applicationId);
+    Optional<UnderwritingDecision>
+    findTopByApplicationid_ApplicationIdOrderByDecisionDateDesc(Long applicationId);
 }
