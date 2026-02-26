@@ -1,6 +1,6 @@
 package com.CardMaster.model.tap;
 
-import com.CardMaster.Enum.tap.Channel;
+import com.CardMaster.Enum.tap.TransactionChannel;
 import com.CardMaster.Enum.tap.TransactionStatus;
 import com.CardMaster.model.cias.CardAccount;
 import jakarta.persistence.*;
@@ -33,7 +33,7 @@ public class Transaction {
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private Channel channel;
+    private TransactionChannel channel;
 
     @NotNull
     private LocalDateTime transactionDate;

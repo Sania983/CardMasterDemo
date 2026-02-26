@@ -3,7 +3,7 @@ package com.CardMaster.mapper.bsp;
 import com.CardMaster.dto.bsp.PaymentDto;
 import com.CardMaster.model.bsp.Payment;
 import com.CardMaster.Enum.bsp.PaymentMethod;
-import com.CardMaster.Enum.tap.PaymentStatus;
+import com.CardMaster.Enum.bsp.PaymentStatus;
 import com.CardMaster.model.cias.CardAccount;
 import com.CardMaster.dao.cias.CardAccountRepository;
 import lombok.RequiredArgsConstructor;
