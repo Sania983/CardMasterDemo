@@ -81,12 +81,13 @@ public class UserController {
     // POST logout
     @PostMapping("/logout")
     public ResponseEntity<ResponseStructure<String>> logout(@RequestHeader("Authorization") String token) {
-        String userId = jwtUtil.extractUserId(token.substring(7)); // extract userId
-        userService.logoutUser(Long.parseLong(userId)); // ✅ delegate to service
+        Long userId = jwtUtil.extractUserId(token.substring(7)); // ✅ returns Long
+        userService.logoutUser(userId); // ✅ pass directly
 
         ResponseStructure<String> r = new ResponseStructure<>();
         r.setMsg("Logout Successful");
         r.setData("Goodbye " + userId);
         return ResponseEntity.status(HttpStatus.OK).body(r);
     }
+
 }

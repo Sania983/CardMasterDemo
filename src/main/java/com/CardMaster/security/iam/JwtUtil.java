@@ -14,24 +14,31 @@ public class JwtUtil {
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private final long expirationMs = 3600000; // 1 hour
 
-    // Generate token with subject (can be userId or username)
-    public String generateToken(String subject) {
+    // Generate token with userId, username, and role
+    public String generateToken(Long userId, String username, String role) {
         return Jwts.builder()
-                .setSubject(subject) // subject can be userId or username
+                .setSubject(username) // subject = username
+                .claim("userId", userId) // custom claim
+                .claim("role", role)     //  custom claim
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(key)
                 .compact();
     }
 
-    // Extract username (if you stored username in subject)
+    // Extract username (subject)
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Extract userId (if you stored userId in subject)
-    public String extractUserId(String token) {
-        return extractClaim(token, Claims::getSubject);
+    // Extract userId
+    public Long extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", Long.class));
+    }
+
+    // Extract role
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
     // Generic claim extractor
