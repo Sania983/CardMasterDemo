@@ -1,4 +1,4 @@
-package com.CardMaster.exceptions.paa;
+package com.CardMaster.paa;
 
 import com.CardMaster.exceptions.paa.ApplicationNotFoundException;
 import org.springframework.http.HttpStatus;

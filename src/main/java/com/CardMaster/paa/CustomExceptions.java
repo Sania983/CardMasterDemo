@@ -1,4 +1,4 @@
-package com.CardMaster.exceptions.paa;
+package com.CardMaster.paa;
 
 /**
  * Collection of custom exceptions for Card Application and Document modules.

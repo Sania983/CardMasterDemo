@@ -2,7 +2,7 @@ package com.CardMaster.service.paa;
 
 import com.CardMaster.dao.paa.CustomerRepository;
 import com.CardMaster.dto.paa.CustomerDto;
-import com.CardMaster.exception.paa.CustomerNotFoundException;
+import com.CardMaster.exceptions.paa.CustomerNotFoundException;
 import com.CardMaster.mapper.paa.EntityMapper;
 import com.CardMaster.model.paa.ContactInfo_Customer;
 import com.CardMaster.model.paa.Customer;
