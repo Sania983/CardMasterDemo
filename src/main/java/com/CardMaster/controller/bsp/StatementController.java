@@ -3,7 +3,7 @@ package com.CardMaster.controller.bsp;
 import com.CardMaster.dto.bsp.StatementDto;
 import com.CardMaster.mapper.bsp.StatementMapper;
 import com.CardMaster.model.bsp.Statement;
-import com.CardMaster.service.bsp.billing.StatementService;
+import com.CardMaster.service.bsp.StatementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

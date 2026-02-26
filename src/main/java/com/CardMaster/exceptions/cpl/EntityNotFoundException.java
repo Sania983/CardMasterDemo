@@ -1,4 +1,4 @@
-package com.CardMaster.exception.cpl;
+package com.CardMaster.exceptions.cpl;
 
 public class EntityNotFoundException extends RuntimeException {
     private final String entityName;
