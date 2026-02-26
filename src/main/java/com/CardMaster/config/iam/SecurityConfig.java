@@ -34,6 +34,19 @@ public class SecurityConfig {
                         // Admin-only endpoints
                         .requestMatchers("/users", "/users/*", "/auditlogs/**").hasRole("ADMIN")
 
+                        // Scores (POST + GET)
+                        .requestMatchers(
+                                "/applications/*/scores",
+                                "/applications/*/scores/latest"
+                        ).hasAnyRole("UNDERWRITER", "ADMIN")
+
+                        // Decisions (POST + GET)
+                        .requestMatchers(
+                                "/applications/*/decisions",
+                                "/applications/*/decisions/latest"
+                        ).hasRole("UNDERWRITER")
+
+
                         // All other endpoints require authentication
                         .anyRequest().authenticated()
                 )
