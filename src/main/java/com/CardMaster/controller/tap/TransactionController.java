@@ -34,7 +34,7 @@ public class TransactionController {
      */
     @PostMapping("/post/{id}")
     public ResponseEntity<TransactionDto> post(@PathVariable Long id) {
-        Transaction posted = service.post(id);
+        TransactionDto posted = service.post(id);
         return ResponseEntity.ok(mapper.toDTO(posted));
     }
 
