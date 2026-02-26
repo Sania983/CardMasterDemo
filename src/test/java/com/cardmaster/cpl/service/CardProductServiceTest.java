@@ -5,27 +5,27 @@ import com.CardMaster.dto.cpl.CardProductRequestDto;
 import com.CardMaster.dto.cpl.CardProductResponseDto;
 import com.CardMaster.mapper.cpl.CardProductMapper;
 import com.CardMaster.model.cpl.CardProduct;
+import com.CardMaster.Enum.cpl.CardCategory;
+import com.CardMaster.Enum.cpl.ProductStatus;
 import com.CardMaster.service.cpl.CardProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;     // AssertJ (optional but nice)
+import static org.junit.jupiter.api.Assertions.assertThrows;   // JUnit assertion for exceptions
 import static org.mockito.Mockito.*;
 
-/**
- * Unit tests for CardProductService.
- * Mocks the repository and mapper. No Spring context required.
- */
 @ExtendWith(MockitoExtension.class)
 class CardProductServiceTest {
 
@@ -38,87 +38,176 @@ class CardProductServiceTest {
     @InjectMocks
     private CardProductService service;
 
-    private CardProductRequestDto requestDto;
-    private CardProduct entityBeforeSave;
-    private CardProduct entitySaved;
-    private CardProductResponseDto responseDto;
+    @Captor
+    private ArgumentCaptor<CardProduct> productCaptor;
+
+    private CardProductRequestDto request;
+    private CardProduct entity;
+    private CardProduct saved;
+    private CardProductResponseDto response;
 
     @BeforeEach
     void setUp() {
-        // ----- build request -----
-        requestDto = new CardProductRequestDto();
-        requestDto.setName("Platinum Plus");
-        requestDto.setCategory("PLATINUM");
-        requestDto.setInterestRate(new BigDecimal("2.75"));
-        requestDto.setAnnualFee(new BigDecimal("2999"));
-        requestDto.setStatus("ACTIVE");
+        // ----- Build reusable test data -----
+        request = new CardProductRequestDto();
+        request.setName("Platinum Plus");
+        request.setCategory(CardCategory.Platinum);
+        request.setInterestRate(2.49);
+        request.setAnnualFee(4999.0);
+        request.setStatus(ProductStatus.ACTIVE);
 
-        // ----- entity mapping (pre-save & post-save) -----
-        entityBeforeSave = new CardProduct();
-        entityBeforeSave.setName("Platinum Plus");
-        entityBeforeSave.setCategory("PLATINUM");
-        entityBeforeSave.setInterestRate(new BigDecimal("2.75"));
-        entityBeforeSave.setAnnualFee(new BigDecimal("2999"));
-        entityBeforeSave.setStatus("ACTIVE");
+        entity = CardProduct.builder()
+                .name(request.getName())
+                .category(request.getCategory())
+                .interestRate(request.getInterestRate())
+                .annualFee(request.getAnnualFee())
+                .status(request.getStatus())
+                .build();
 
-        entitySaved = new CardProduct();
-        entitySaved.setProductId(1L);
-        entitySaved.setName("Platinum Plus");
-        entitySaved.setCategory("PLATINUM");
-        entitySaved.setInterestRate(new BigDecimal("2.75"));
-        entitySaved.setAnnualFee(new BigDecimal("2999"));
-        entitySaved.setStatus("ACTIVE");
+        saved = CardProduct.builder()
+                .productId(101L)
+                .name(request.getName())
+                .category(request.getCategory())
+                .interestRate(request.getInterestRate())
+                .annualFee(request.getAnnualFee())
+                .status(request.getStatus())
+                .build();
 
-        // ----- response mapping -----
-        responseDto = new CardProductResponseDto();
-        responseDto.setProductId(1L);
-        responseDto.setName("Platinum Plus");
-        responseDto.setCategory("PLATINUM");
-        responseDto.setInterestRate(new BigDecimal("2.75"));
-        responseDto.setAnnualFee(new BigDecimal("2999"));
-        responseDto.setStatus("ACTIVE");
+        response = CardProductResponseDto.builder()
+                .productId(saved.getProductId())
+                .name(saved.getName())
+                .category(saved.getCategory())
+                .interestRate(saved.getInterestRate())
+                .annualFee(saved.getAnnualFee())
+                .status(saved.getStatus())
+                .build();
     }
 
-    @Test
-    @DisplayName("create(): maps request -> entity, saves, maps entity -> response")
-    void create_success() {
-        // mapper.toEntity(request) -> entityBeforeSave
-        when(mapper.toEntity(requestDto)).thenReturn(entityBeforeSave);
-        // repository.save(entityBeforeSave) -> entitySaved
-        when(repository.save(entityBeforeSave)).thenReturn(entitySaved);
-        // mapper.toResponse(entitySaved) -> responseDto
-        when(mapper.toResponse(entitySaved)).thenReturn(responseDto);
+    @Nested
+    @DisplayName("create()")
+    class CreateTests {
 
-        CardProductResponseDto result = service.create(requestDto);
+        @Test
+        @DisplayName("maps request -> entity, saves, and maps saved -> response")
+        void create_success() {
+            // Arrange
+            when(mapper.toEntity(request)).thenReturn(entity);
+            when(repository.save(entity)).thenReturn(saved);
+            when(mapper.toResponse(saved)).thenReturn(response);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getProductId().equals(1L);
-        assertThat(result.getName()).isEqualTo("Platinum Plus");
+            // Act
+            CardProductResponseDto result = service.create(request);
 
-        // verify interactions & captured argument to save
-        ArgumentCaptor<CardProduct> entityCaptor = ArgumentCaptor.forClass(CardProduct.class);
-        verify(mapper).toEntity(requestDto);
-        verify(repository).save(entityCaptor.capture());
-        verify(mapper).toResponse(entitySaved);
+            // Assert
+            assertThat(result).isNotNull();
+            assertThat(result.getProductId()).isEqualTo(101L);
+            assertThat(result.getName()).isEqualTo("Platinum Plus");
+            assertThat(result.getCategory()).isEqualTo(CardCategory.Platinum);
+            assertThat(result.getInterestRate()).isEqualTo(2.49);
+            assertThat(result.getAnnualFee()).isEqualTo(4999.0);
+            assertThat(result.getStatus()).isEqualTo(ProductStatus.ACTIVE);
 
-        CardProduct savedArg = entityCaptor.getValue();
-        assertThat(savedArg.getName()).isEqualTo("Platinum Plus");
-        assertThat(savedArg.getAnnualFee()).isEqualTo(new BigDecimal("2999"));
-        verifyNoMoreInteractions(mapper, repository);
+            // Verify interactions and the entity that was saved
+            verify(mapper).toEntity(request);
+            verify(repository).save(productCaptor.capture());
+            verify(mapper).toResponse(saved);
+            verifyNoMoreInteractions(mapper, repository);
+
+            CardProduct captured = productCaptor.getValue();
+            assertThat(captured.getName()).isEqualTo(request.getName());
+            assertThat(captured.getCategory()).isEqualTo(request.getCategory());
+            assertThat(captured.getInterestRate()).isEqualTo(request.getInterestRate());
+            assertThat(captured.getAnnualFee()).isEqualTo(request.getAnnualFee());
+            assertThat(captured.getStatus()).isEqualTo(request.getStatus());
+        }
     }
 
-    @Test
-    @DisplayName("findAll(): returns mapped list")
-    void findAll_success() {
-        when(repository.findAll()).thenReturn(List.of(entitySaved));
-        when(mapper.toResponse(entitySaved)).thenReturn(responseDto);
+    @Nested
+    @DisplayName("findAll()")
+    class FindAllTests {
 
-        List<CardProductResponseDto> list = service.findAll();
+        @Test
+        @DisplayName("returns mapped DTOs for all entities")
+        void findAll_success() {
+            // Arrange: two entities, two DTOs
+            CardProduct e1 = saved;
 
-        assertThat(list).hasSize(1);
-        assertThat(list.getFirst().getProductId().equals(1L);
+            CardProduct e2 = CardProduct.builder()
+                    .productId(202L)
+                    .name("Gold Everyday")
+                    .category(CardCategory.Gold)
+                    .interestRate(3.25)
+                    .annualFee(1999.0)
+                    .status(ProductStatus.ACTIVE)
+                    .build();
 
-        verify(repository).findAll();
-        verify(mapper).toResponse(entitySaved);
+            CardProductResponseDto r1 = response;
+
+            CardProductResponseDto r2 = CardProductResponseDto.builder()
+                    .productId(202L)
+                    .name("Gold Everyday")
+                    .category(CardCategory.Gold)
+                    .interestRate(3.25)
+                    .annualFee(1999.0)
+                    .status(ProductStatus.ACTIVE)
+                    .build();
+
+            when(repository.findAll()).thenReturn(List.of(e1, e2));
+            when(mapper.toResponse(e1)).thenReturn(r1);
+            when(mapper.toResponse(e2)).thenReturn(r2);
+
+            // Act
+            List<CardProductResponseDto> result = service.findAll();
+
+            // Assert
+            assertThat(result).hasSize(2);
+            assertThat(result.get(0).getProductId()).isEqualTo(101L);
+            assertThat(result.get(1).getProductId()).isEqualTo(202L);
+
+            verify(repository).findAll();
+            verify(mapper).toResponse(e1);
+            verify(mapper).toResponse(e2);
+            verifyNoMoreInteractions(mapper, repository);
+        }
+    }
+
+    @Nested
+    @DisplayName("findById()")
+    class FindByIdTests {
+
+        @Test
+        @DisplayName("returns mapped DTO when entity is found")
+        void findById_success() {
+            // Arrange
+            Long id = 101L;
+            when(repository.findById(id)).thenReturn(Optional.of(saved));
+            when(mapper.toResponse(saved)).thenReturn(response);
+
+            // Act
+            CardProductResponseDto result = service.findById(id);
+
+            // Assert
+            assertThat(result).isNotNull();
+            assertThat(result.getProductId()).isEqualTo(101L);
+            verify(repository).findById(id);
+            verify(mapper).toResponse(saved);
+            verifyNoMoreInteractions(mapper, repository);
+        }
+
+        @Test
+        @DisplayName("throws RuntimeException('Product not found') when entity is missing")
+        void findById_notFound() {
+            // Arrange
+            Long id = 999L;
+            when(repository.findById(id)).thenReturn(Optional.empty());
+
+            // Act + Assert
+            RuntimeException ex = assertThrows(RuntimeException.class, () -> service.findById(id));
+            assertThat(ex.getMessage()).isEqualTo("Product not found");
+
+            verify(repository).findById(id);
+            verifyNoInteractions(mapper);
+            verifyNoMoreInteractions(repository);
+        }
     }
 }
