@@ -54,7 +54,9 @@ public class UserService {
         }
 
         logAction(user, "LOGIN", "User Login");
-        return jwtUtil.generateToken(user.getUserId().toString());
+
+        // ✅ Pass userId, username, and role into the token
+        return jwtUtil.generateToken(user.getUserId(), user.getName(), user.getRole().name());
     }
 
     // Logout user
