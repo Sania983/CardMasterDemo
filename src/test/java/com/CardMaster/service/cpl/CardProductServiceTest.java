@@ -1,4 +1,4 @@
-package com.cardmaster.cpl.service;
+package com.CardMaster.service.cpl;
 
 import com.CardMaster.Enum.cpl.CardCategory;
 import com.CardMaster.Enum.cpl.ProductStatus;
