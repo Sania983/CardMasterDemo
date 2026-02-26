@@ -32,7 +32,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/users/logout").authenticated()
                         // Admin-only endpoints
-                        .requestMatchers("/users", "/users/*", "/auditlogs/**").hasRole("ADMIN")
+                        .requestMatchers("/users", "/users/*", "/auditlogs/**").hasAnyRole("ADMIN", "UNDERWRITER")
 
                         // Scores (POST + GET)
                         .requestMatchers(
