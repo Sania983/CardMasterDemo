@@ -10,7 +10,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true) // ✅ enables @PreAuthorize annotations
+@EnableMethodSecurity(prePostEnabled = true) //  enables @PreAuthorize annotations
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
@@ -33,6 +33,19 @@ public class SecurityConfig {
                         .requestMatchers("/users/logout").authenticated()
                         // Admin-only endpoints
                         .requestMatchers("/users", "/users/*", "/auditlogs/**").hasRole("ADMIN")
+
+                        // Scores (POST + GET)
+                        .requestMatchers(
+                                "/applications/*/scores",
+                                "/applications/*/scores/latest"
+                        ).hasAnyRole("UNDERWRITER", "ADMIN")
+
+                        // Decisions (POST + GET)
+                        .requestMatchers(
+                                "/applications/*/decisions",
+                                "/applications/*/decisions/latest"
+                        ).hasRole("UNDERWRITER")
+
 
                         // All other endpoints require authentication
                         .anyRequest().authenticated()
