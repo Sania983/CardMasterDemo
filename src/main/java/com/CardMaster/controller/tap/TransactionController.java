@@ -3,7 +3,7 @@ package com.CardMaster.controller.tap;
 import com.CardMaster.dto.tap.TransactionDto;
 import com.CardMaster.mapper.tap.TransactionMapper;
 import com.CardMaster.model.tap.Transaction;
-import com.CardMaster.service.txn.TransactionService;
+import com.CardMaster.service.tap.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
