@@ -1,7 +1,9 @@
 package com.CardMaster.service.iam;
 
 import com.CardMaster.dao.iam.AuditLogRepository;
+import com.CardMaster.dao.iam.UserRepository;
 import com.CardMaster.model.iam.AuditLog;
+import com.CardMaster.model.iam.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -11,35 +13,30 @@ import java.util.List;
 public class AuditLogService {
 
     private final AuditLogRepository auditLogRepository;
+    private final UserRepository userRepository;
 
-
-    public AuditLogService(AuditLogRepository auditLogRepository) {
+    public AuditLogService(AuditLogRepository auditLogRepository, UserRepository userRepository) {
         this.auditLogRepository = auditLogRepository;
+        this.userRepository = userRepository;
     }
+    public List<AuditLog> getAllLogs() { return auditLogRepository.findAll(); }
 
-    /**
-     * Records an audit log entry.
-     *
-     * @param username The user who performed the action
-     * @param action   The action type (REGISTER, LOGIN, LOGOUT, etc.)
-     * @param resource The resource affected (User, Application, Card, etc.)
-     */
-    public void log(String username, String action, String resource) {
+    // Log usin
+    // g a User entity
+    public void log(User user, String action, String resource) {
         AuditLog log = new AuditLog();
+        log.setUser(user);
         log.setAction(action);
         log.setResource(resource);
-        log.setMetadata("Performed by " + username);
+        log.setMetadata("Performed by " + user.getName());
         log.setTimestamp(LocalDateTime.now());
-
         auditLogRepository.save(log);
     }
 
-    /**
-     * Retrieves all audit logs from the database.
-     *
-     * @return List of AuditLog entries
-     */
-    public List<AuditLog> getAllLogs() {
-        return auditLogRepository.findAll();
+    // Convenience method: log by email (resolves User first)
+    public void log(String email, String action, String resource) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+        log(user, action, resource);
     }
 }

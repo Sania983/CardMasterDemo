@@ -54,7 +54,9 @@ public class UserService {
         }
 
         logAction(user, "LOGIN", "User Login");
-        return jwtUtil.generateToken(user.getUserId().toString());
+
+        // ✅ Pass userId, username, and role into the token
+        return jwtUtil.generateToken(user.getUserId(), user.getName(), user.getRole().name());
     }
 
     // Logout user
@@ -64,10 +66,10 @@ public class UserService {
         logAction(user, "LOGOUT", "User Logout");
     }
 
-    // Helper method to save audit logs
+    // Helper method to save audit logs with full User entity
     private void logAction(User user, String action, String resource) {
         AuditLog log = new AuditLog();
-        log.setUser(user);
+        log.setUser(user); // ✅ always attach full User entity
         log.setAction(action);
         log.setResource(resource);
         log.setMetadata("Performed by " + user.getName());

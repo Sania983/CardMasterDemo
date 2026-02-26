@@ -6,7 +6,6 @@ import com.CardMaster.mapper.iam.UserMapper;
 import com.CardMaster.model.iam.User;
 import com.CardMaster.security.iam.JwtUtil;
 import com.CardMaster.service.iam.UserService;
-import com.CardMaster.service.iam.AuditLogService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -24,12 +23,10 @@ public class UserController {
 
     private final UserService userService;
     private final JwtUtil jwtUtil;
-    private final AuditLogService auditLogService;
 
-    public UserController(UserService userService, JwtUtil jwtUtil, AuditLogService auditLogService) {
+    public UserController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
-        this.auditLogService = auditLogService;
     }
 
     // GET all users
@@ -62,8 +59,6 @@ public class UserController {
         log.info("Inside register user Controller");
         User saved = userService.registerUser(user);
 
-        auditLogService.log(saved.getEmail(), "REGISTER", "User Registration");
-
         ResponseStructure<UserDto> resp = new ResponseStructure<>();
         resp.setMsg("User created successfully");
         resp.setData(UserMapper.toDto(saved));
@@ -77,8 +72,6 @@ public class UserController {
 
         String token = userService.loginUser(user.getUserId(), user.getPassword());
 
-        auditLogService.log(user.getEmail(), "LOGIN", "User Login");
-
         ResponseStructure<String> r = new ResponseStructure<>();
         r.setMsg("Login Successful");
         r.setData("Bearer " + token);
@@ -88,12 +81,13 @@ public class UserController {
     // POST logout
     @PostMapping("/logout")
     public ResponseEntity<ResponseStructure<String>> logout(@RequestHeader("Authorization") String token) {
-        String username = jwtUtil.extractUsername(token.substring(7));
-        auditLogService.log(username, "LOGOUT", "User Logout");
+        Long userId = jwtUtil.extractUserId(token.substring(7)); // ✅ returns Long
+        userService.logoutUser(userId); // ✅ pass directly
 
         ResponseStructure<String> r = new ResponseStructure<>();
         r.setMsg("Logout Successful");
-        r.setData("Goodbye " + username);
+        r.setData("Goodbye " + userId);
         return ResponseEntity.status(HttpStatus.OK).body(r);
     }
+
 }
