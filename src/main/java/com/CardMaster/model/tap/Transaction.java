@@ -22,6 +22,7 @@ public class Transaction {
     @JoinColumn(name = "account_id", nullable = false)
     private CardAccount accountId;
 
+
     @NotNull @Positive
     private Double amount;
 
@@ -42,6 +43,6 @@ public class Transaction {
     @NotNull
     private TransactionStatus status;
 
-    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "transactionId", cascade = CascadeType.ALL)
     private List<TransactionHold> holds;
 }

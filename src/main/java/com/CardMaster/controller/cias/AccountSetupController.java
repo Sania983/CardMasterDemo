@@ -4,7 +4,6 @@ import com.CardMaster.model.cias.CardAccount;
 import com.CardMaster.service.cias.AccountSetupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,12 +14,6 @@ import java.util.List;
 public class AccountSetupController {
 
     private final AccountSetupService accountSetupService;
-
-    // Create a new account
-    @PostMapping
-    public ResponseEntity<CardAccount> createAccount(@RequestBody CardAccount account,@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(accountSetupService.createAccount(account, token));
-    }
 
     // Get all accounts
     @GetMapping

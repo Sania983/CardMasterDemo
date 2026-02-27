@@ -5,7 +5,6 @@ import com.CardMaster.model.cias.CardAccount;
 import com.CardMaster.service.cias.CardIssuanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,14 +16,13 @@ public class CardIssuanceController {
 
     private final CardIssuanceService cardIssuanceService;
 
-    // Issue a new card and create its account
+    // Issue card + account
     @PostMapping("/issue")
     public ResponseEntity<CardAccount> issueCard(@RequestParam Long customerId,
                                                  @RequestParam Long productId,
-                                                 @RequestParam Double creditLimit,
-                                                 @RequestHeader("Authorization") String token) {
+                                                 @RequestParam Double creditLimit) {
         return ResponseEntity.ok(
-                cardIssuanceService.issueCard(customerId, productId, creditLimit, token)
+                cardIssuanceService.issueCard(customerId, productId, creditLimit)
         );
     }
     //later added
@@ -40,11 +38,18 @@ public class CardIssuanceController {
 
     //till here
 
+    // Activate card
+    @PutMapping("/{cardId}/activate")
+    public ResponseEntity<Card> activateCard(@PathVariable Long cardId) {
+        return ResponseEntity.ok(cardIssuanceService.activateCard(cardId));
+    }
+
     // Get all cards
     @GetMapping
     public ResponseEntity<List<Card>> getAllCards() {
         return ResponseEntity.ok(cardIssuanceService.getAllCards());
     }
+<<<<<<< HEAD
 
     // Get all accounts
     @GetMapping("/accounts")
@@ -52,4 +57,6 @@ public class CardIssuanceController {
         return ResponseEntity.ok(cardIssuanceService.getAllAccounts());
     }
 
+=======
+>>>>>>> 782e4170f7daa7d67540b3b67ab0dc8154d89793
 }
