@@ -1,6 +1,6 @@
 package com.CardMaster.dto.tap;
 
-import com.CardMaster.Enum.tap.Channel;
+import com.CardMaster.Enum.tap.TransactionChannel;
 import com.CardMaster.Enum.tap.TransactionStatus;
 import lombok.Data;
 import lombok.Builder;
@@ -19,7 +19,7 @@ public class TransactionDto {
     private Double amount;
     private String currency;
     private String merchant;
-    private Channel channel;
+    private TransactionChannel channel;
     private LocalDateTime transactionDate;
     private TransactionStatus status;
 }

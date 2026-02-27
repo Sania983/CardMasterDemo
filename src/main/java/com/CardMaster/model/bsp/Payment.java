@@ -1,7 +1,7 @@
 package com.CardMaster.model.bsp;
 
 import com.CardMaster.Enum.bsp.PaymentMethod;
-import com.CardMaster.Enum.tap.PaymentStatus;
+import com.CardMaster.Enum.bsp.PaymentStatus;
 import com.CardMaster.model.cias.CardAccount;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
