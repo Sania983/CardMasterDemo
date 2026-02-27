@@ -22,6 +22,7 @@ public class Transaction {
     @JoinColumn(name = "account_id", nullable = false)
     private CardAccount accountId;
 
+
     @NotNull @Positive
     private Double amount;
 
