@@ -52,8 +52,8 @@ public class Customer {
     public enum EmploymentType {
         Salaried, SelfEmployed, Student, Retired, Unemployed
     }
-
     public enum CustomerStatus {
         Active, Inactive, Suspended, Closed
     }
+
 }

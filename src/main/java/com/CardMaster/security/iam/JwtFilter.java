@@ -36,7 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
             token = authHeader.substring(7); // remove "Bearer "
             if (jwtUtil.validateToken(token)) {
                 username = jwtUtil.extractUsername(token);
-                role = jwtUtil.extractRole(token); // ✅ extract role claim
+                role = jwtUtil.extractRole(token); //  extract role claim
             }
         }
 

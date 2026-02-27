@@ -4,13 +4,14 @@ import com.CardMaster.security.iam.JwtFilter;
 import com.CardMaster.exceptions.iam.CustomAccessDeniedHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true) // ✅ enables @PreAuthorize annotations
+@EnableMethodSecurity(prePostEnabled = true) //  enables @PreAuthorize annotations
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
@@ -32,7 +33,27 @@ public class SecurityConfig {
 
                         .requestMatchers("/users/logout").authenticated()
                         // Admin-only endpoints
+                        .requestMatchers("/users", "/users/*", "/auditlogs/**").hasAnyRole("ADMIN", "UNDERWRITER")
+
+
                         .requestMatchers("/users", "/users/*", "/auditlogs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/applications/**").hasAnyRole("CUSTOMER","ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/applications/**").hasAnyRole("UNDERWRITER","ADMIN","CUSTOMER")
+                        .requestMatchers(HttpMethod.PUT, "/applications/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/applications/**").hasRole("ADMIN")
+
+                        // Scores (POST + GET)
+                        .requestMatchers(
+                                "/applications/*/scores",
+                                "/applications/*/scores/latest"
+                        ).hasAnyRole("UNDERWRITER", "ADMIN")
+
+                        // Decisions (POST + GET)
+                        .requestMatchers(
+                                "/applications/*/decisions",
+                                "/applications/*/decisions/latest"
+                        ).hasRole("UNDERWRITER")
+
 
                         // All other endpoints require authentication
                         .anyRequest().authenticated()

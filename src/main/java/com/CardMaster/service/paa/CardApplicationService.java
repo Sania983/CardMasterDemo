@@ -4,6 +4,8 @@ import com.CardMaster.dao.cpl.CardProductRepository;
 import com.CardMaster.dao.paa.CardApplicationRepository;
 import com.CardMaster.dao.paa.CustomerRepository;
 import com.CardMaster.dao.paa.DocumentRepository;
+import com.CardMaster.dto.cau.UnderwritingDecisionRequest;
+import com.CardMaster.dto.cau.UnderwritingDecisionResponse;
 import com.CardMaster.dto.paa.CardApplicationDto;
 import com.CardMaster.exceptions.paa.ApplicationNotFoundException;
 import com.CardMaster.exceptions.paa.CustomerNotFoundException;
@@ -14,6 +16,7 @@ import com.CardMaster.model.paa.CardApplication;
 import com.CardMaster.model.paa.Customer;
 import com.CardMaster.model.paa.Document;
 import com.CardMaster.security.iam.JwtUtil;
+import com.CardMaster.service.cau.UnderwritingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +32,7 @@ CardApplicationService {
     private final CustomerRepository customerRepository;
     private final CardProductRepository productRepo;
     private final DocumentRepository documentRepository;
+    private final UnderwritingService underwritingService;
     private final JwtUtil jwtUtil;
 
     // --- Create Application ---
@@ -91,28 +95,28 @@ CardApplicationService {
     }
 
     // --- Update Application Status ---
-    public CardApplicationDto updateApplicationStatus(Long id, String status, String token) {
-        jwtUtil.extractUsername(token.substring(7)); // validate token
+    public CardApplicationDto updateApplicationStatus(Long appId, String status, String token) {
+            jwtUtil.extractUsername(token.substring(7)); // validate token
 
-        CardApplication app = applicationRepository.findById(id)
-                .orElseThrow(() -> new ApplicationNotFoundException("Application not found with id: " + id));
+            CardApplication app = applicationRepository.findById(appId)
+                    .orElseThrow(() -> new ApplicationNotFoundException("Application not found with id: " + appId));
 
-        try {
-            app.setStatus(CardApplication.CardApplicationStatus.valueOf(status.toUpperCase()));
-        } catch (IllegalArgumentException e) {
-            throw new ApplicationNotFoundException("Invalid status value: " + status);
+            // Build underwriting request
+            UnderwritingDecisionRequest req = new UnderwritingDecisionRequest();
+            req.setDecision(status != null ? Enum.valueOf(com.CardMaster.Enum.cau.UnderwritingDecisionType.class, status.toUpperCase()) : null);
+            req.setApprovedLimit(app.getRequestedLimit());
+            req.setRemarks("Decision triggered via CardApplicationService");
+
+            // Delegate to underwriting service
+            UnderwritingDecisionResponse decisionResponse =
+                    underwritingService.createDecision(appId, req, "Bearer " + token);
+
+            // Application status is updated inside underwriting service
+            CardApplication updated = applicationRepository.findById(appId)
+                    .orElseThrow(() -> new ApplicationNotFoundException("Application not found after decision"));
+
+            return EntityMapper.toCardApplicationDto(updated);
         }
-
-        List<Document> docs = documentRepository.findByApplicationApplicationId(id);
-        boolean hasRejectedDoc = docs.stream()
-                .anyMatch(doc -> doc.getStatus() == Document.DocumentStatus.Rejected);
-        if (hasRejectedDoc) {
-            app.setStatus(CardApplication.CardApplicationStatus.Rejected);
-        }
-
-        CardApplication updated = applicationRepository.save(app);
-        return EntityMapper.toCardApplicationDto(updated);
-    }
 
     // --- Delete Application ---
     public void deleteApplication(Long id, String token) {
