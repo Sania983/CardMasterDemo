@@ -42,6 +42,6 @@ public class Transaction {
     @NotNull
     private TransactionStatus status;
 
-    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "transactionId", cascade = CascadeType.ALL)
     private List<TransactionHold> holds;
 }
