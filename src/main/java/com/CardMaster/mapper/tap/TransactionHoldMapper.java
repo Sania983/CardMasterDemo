@@ -20,7 +20,7 @@ public class TransactionHoldMapper {
                 .orElseThrow(() -> new IllegalArgumentException("Transaction not found with ID: " + dto.getTransactionId()));
 
         TransactionHold hold = new TransactionHold();
-        hold.setTransactionId(transaction);   // ✅ matches entity field name
+        hold.setTransactionId(transaction);   //  matches entity field name
         hold.setAmount(dto.getAmount());
         hold.setHoldDate(dto.getHoldDate());
         hold.setReleaseDate(dto.getReleaseDate());
@@ -31,7 +31,7 @@ public class TransactionHoldMapper {
     public TransactionHoldDto toDTO(TransactionHold hold) {
         TransactionHoldDto dto = new TransactionHoldDto();
         dto.setHoldId(hold.getHoldId());
-        dto.setTransactionId(hold.getTransactionId().getTransactionId()); // ✅ extract ID from Transaction
+        dto.setTransactionId(hold.getTransactionId().getTransactionId()); //  extract ID from Transaction
         dto.setAmount(hold.getAmount());
         dto.setHoldDate(hold.getHoldDate());
         dto.setReleaseDate(hold.getReleaseDate());

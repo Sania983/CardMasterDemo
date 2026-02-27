@@ -5,6 +5,7 @@ import com.CardMaster.model.tap.Transaction;
 import com.CardMaster.model.cias.CardAccount;
 import com.CardMaster.dao.cias.CardAccountRepository;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 
@@ -43,4 +44,5 @@ public class TransactionMapper {
         dto.setStatus(tx.getStatus());
         return dto;
     }
+
 }
