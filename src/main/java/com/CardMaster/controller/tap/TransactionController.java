@@ -30,6 +30,18 @@ public class TransactionController {
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Post (capture) a previously authorized transaction by its ID.
+     */
+    @PostMapping("/post/{id}")
+    public ResponseEntity<Transaction> post(@PathVariable Long id) {
+        TransactionDto posted = service.post(id);
+        return ResponseEntity.ok(mapper.toEntity(posted));
+    }
+
+    /**
+>>>>>>> 9cc478afe2c2d784737a60c770cf924f466c713b
      * Reverse a transaction (void an auth or reverse a posted transaction).
      */
     @PostMapping("/reverse/{id}")
