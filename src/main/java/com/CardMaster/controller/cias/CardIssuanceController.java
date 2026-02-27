@@ -27,6 +27,18 @@ public class CardIssuanceController {
                 cardIssuanceService.issueCard(customerId, productId, creditLimit, token)
         );
     }
+    //later added
+    @PostMapping("/{id}/activate")
+    public ResponseEntity<Card> activateCard(@PathVariable Long id) {
+        return ResponseEntity.ok(cardIssuanceService.activateCard(id));
+    }
+
+    @PostMapping("/{id}/block")
+    public ResponseEntity<Card> blockCard(@PathVariable Long id) {
+        return ResponseEntity.ok(cardIssuanceService.blockCard(id));
+    }
+
+    //till here
 
     // Get all cards
     @GetMapping
@@ -40,9 +52,4 @@ public class CardIssuanceController {
         return ResponseEntity.ok(cardIssuanceService.getAllAccounts());
     }
 
-    // Create a card directly (without issuing account)
-    @PostMapping
-    public ResponseEntity<Card> createCard(@RequestBody Card card) {
-        return ResponseEntity.ok(cardIssuanceService.saveCard(card));
-    }
 }

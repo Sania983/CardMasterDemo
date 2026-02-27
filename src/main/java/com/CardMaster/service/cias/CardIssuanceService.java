@@ -28,46 +28,78 @@ public class CardIssuanceService {
     private final CardProductRepository productRepository;
     private final JwtUtil jwtUtil;
 
+    // Issue Card → ISSUED card + ACTIVE account
     public CardAccount issueCard(Long customerId, Long productId, Double creditLimit, String token) {
-        // Validate JWT
         jwtUtil.extractUsername(token.substring(7));
 
         if (creditLimit == null || creditLimit <= 0) {
-            throw new CardIssuanceException("Credit limit must be provided and positive");
-        }
-        if (customerId == null || productId == null) {
-            throw new CardIssuanceException("Customer ID and Product ID must be provided");
+            throw new CardIssuanceException("Credit limit must be positive");
         }
 
-        try {
-            Customer customer = customerRepository.findById(customerId)
-                    .orElseThrow(() -> new CardIssuanceException("Customer not found with ID: " + customerId));
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CardIssuanceException("Customer not found with ID: " + customerId));
 
-            CardProduct product = productRepository.findById(productId)
-                    .orElseThrow(() -> new CardIssuanceException("Product not found with ID: " + productId));
+        CardProduct product = productRepository.findById(productId)
+                .orElseThrow(() -> new CardIssuanceException("Product not found with ID: " + productId));
 
-            Card card = new Card();
-            card.setCustomer(customer);   // set entity, JPA stores FK
-            card.setProduct(product);     // set entity, JPA stores FK
-            card.setMaskedCardNumber("XXXX-XXXX-XXXX-" + (int)(Math.random() * 9000 + 1000));
-            card.setExpiryDate(LocalDate.now().plusYears(5));
-            card.setCvvHash("dummyHash");
-            card.setStatus(CardStatus.ISSUED);
+        Card card = new Card();
+        card.setCustomer(customer);
+        card.setProduct(product);
+        card.setMaskedCardNumber("XXXX-XXXX-XXXX-" + (int)(Math.random() * 9000 + 1000));
+        card.setExpiryDate(LocalDate.now().plusYears(5));
+        card.setCvvHash("dummyHash");
+        card.setStatus(CardStatus.ISSUED);
 
-            Card savedCard = cardRepository.save(card);
+        Card savedCard = cardRepository.save(card);
 
-            CardAccount account = new CardAccount();
-            account.setCard(savedCard);   // reference Card entity
-            account.setCreditLimit(creditLimit);
-            account.setAvailableLimit(creditLimit);
-            account.setOpenDate(LocalDate.now());
-            account.setStatus(AccountStatus.ACTIVE);
+        CardAccount account = new CardAccount();
+        account.setCard(savedCard);
+        account.setCreditLimit(creditLimit);
+        account.setAvailableLimit(creditLimit);
+        account.setOpenDate(LocalDate.now());
+        account.setStatus(AccountStatus.ACTIVE);
 
-            return accountRepository.save(account);
+        CardAccount savedAccount = accountRepository.save(account);
 
-        } catch (Exception e) {
-            throw new CardIssuanceException("Failed to issue card: " + e.getMessage());
+        // link back for easy traversal
+        savedCard.setCardAccount(savedAccount);
+        cardRepository.save(savedCard);
+
+        return savedAccount;
+    }
+
+    // Activate Card → ISSUED → ACTIVE (account stays ACTIVE)
+    public Card activateCard(Long cardId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new CardIssuanceException("Card not found with ID: " + cardId));
+
+        if (card.getStatus() != CardStatus.ISSUED) {
+            throw new CardIssuanceException("Only ISSUED cards can be activated");
         }
+
+        card.setStatus(CardStatus.ACTIVE);
+        return cardRepository.save(card);
+    }
+
+    // Block Card (wrong PIN) → BLOCKED card + CLOSED account
+    public Card blockCard(Long cardId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new CardIssuanceException("Card not found with ID: " + cardId));
+
+        if (card.getStatus() == CardStatus.BLOCKED) {
+            throw new CardIssuanceException("Card is already blocked");
+        }
+
+        card.setStatus(CardStatus.BLOCKED);
+
+        // directly traverse relationship instead of repository query
+        CardAccount account = card.getCardAccount();
+        if (account != null && account.getStatus() == AccountStatus.ACTIVE) {
+            account.setStatus(AccountStatus.CLOSED);
+            accountRepository.save(account);
+        }
+
+        return cardRepository.save(card);
     }
 
     public List<Card> getAllCards() {
@@ -76,10 +108,6 @@ public class CardIssuanceService {
 
     public List<CardAccount> getAllAccounts() {
         return accountRepository.findAll();
-    }
-
-    public Card saveCard(Card card) {
-        return cardRepository.save(card);
     }
 }
 
