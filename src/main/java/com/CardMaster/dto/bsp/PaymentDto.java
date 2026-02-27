@@ -1,7 +1,7 @@
 package com.CardMaster.dto.bsp;
 
 import com.CardMaster.Enum.bsp.PaymentMethod;
-import com.CardMaster.Enum.tap.PaymentStatus;
+import com.CardMaster.Enum.bsp.PaymentStatus;
 import lombok.Data;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
