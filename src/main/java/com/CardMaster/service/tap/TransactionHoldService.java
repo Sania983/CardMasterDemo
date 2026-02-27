@@ -82,8 +82,6 @@ public class TransactionHoldService {
         if (hold.getReleaseDate() == null) {
             hold.setReleaseDate(LocalDateTime.now());
             hold = holdRepository.save(hold);
-
-            // TODO (optional): If you maintain available limit, add credit-back logic here on the related account.
         }
 
         return hold;
