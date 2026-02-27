@@ -33,9 +33,9 @@ public class TransactionController {
      * Post (capture) a previously authorized transaction by its ID.
      */
     @PostMapping("/post/{id}")
-    public ResponseEntity<TransactionDto> post(@PathVariable Long id) {
+    public ResponseEntity<Transaction> post(@PathVariable Long id) {
         TransactionDto posted = service.post(id);
-        return ResponseEntity.ok(posted);
+        return ResponseEntity.ok(mapper.toEntity(posted));
     }
 
     /**

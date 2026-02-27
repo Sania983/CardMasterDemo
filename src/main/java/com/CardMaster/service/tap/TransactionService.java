@@ -3,6 +3,7 @@ package com.CardMaster.service.tap;
 import com.CardMaster.dao.tap.TransactionRepository;
 import com.CardMaster.dao.tap.TransactionHoldRepository;
 import com.CardMaster.Enum.tap.TransactionStatus;
+import com.CardMaster.dto.tap.TransactionDto;
 import com.CardMaster.exceptions.tap.TransactionNotFoundException;
 import com.CardMaster.model.tap.Transaction;
 import com.CardMaster.model.tap.TransactionHold;
@@ -47,7 +48,7 @@ public class TransactionService {
      * POST (capture) an AUTHORIZED transaction.
      */
     @Transactional
-    public com.CardMaster.dto.tap.TransactionDto post(Long id) {
+    public TransactionDto post(Long id) {
 
         Transaction tx = transactionRepo.findById(id)
                 .orElseThrow(() -> new TransactionNotFoundException(id));
@@ -73,7 +74,7 @@ public class TransactionService {
         tx = transactionRepo.save(tx);
 
         // Convert Entity → DTO manually (beginner-friendly)
-        com.CardMaster.dto.tap.TransactionDto dto =
+       TransactionDto dto =
                 new com.CardMaster.dto.tap.TransactionDto(
                         tx.getTransactionId(),
                         tx.getAccountId().getAccountId(),
