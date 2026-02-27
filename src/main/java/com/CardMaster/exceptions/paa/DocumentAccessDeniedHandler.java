@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component("documentAccessDeniedHandler")
+@Component("documentAccessDeniedHandler1")
 public class DocumentAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override

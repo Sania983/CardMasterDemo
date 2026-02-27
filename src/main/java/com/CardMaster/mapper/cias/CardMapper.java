@@ -31,7 +31,10 @@ public class CardMapper {
         card.setMaskedCardNumber(dto.getMaskedCardNumber());
         card.setExpiryDate(dto.getExpiryDate());
         card.setCvvHash(dto.getCvvHash());
-        card.setStatus(CardStatus.valueOf(dto.getStatus().toUpperCase()));
+        //card.setStatus(CardStatus.valueOf(dto.getStatus().toUpperCase()));
+        //later added
+        card.setStatus(CardStatus.ISSUED); // ✅ enforce ISSUED at creation
+        //till here
         return card;
     }
 

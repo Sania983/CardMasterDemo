@@ -9,6 +9,8 @@ import com.CardMaster.dao.cias.CardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+
 @Component
 @RequiredArgsConstructor
 public class CardAccountMapper {
@@ -23,7 +25,11 @@ public class CardAccountMapper {
         account.setCard(card);
         account.setCreditLimit(dto.getCreditLimit());
         account.setAvailableLimit(dto.getAvailableLimit());
-        account.setStatus(AccountStatus.valueOf(dto.getStatus().toUpperCase()));
+        //account.setStatus(AccountStatus.valueOf(dto.getStatus().toUpperCase()));
+        //later added
+        account.setOpenDate(LocalDate.now()); // ✅ enforce openDate
+        account.setStatus(AccountStatus.ACTIVE); // ✅ enforce ACTIVE at creation
+        //till here
         return account;
     }
 

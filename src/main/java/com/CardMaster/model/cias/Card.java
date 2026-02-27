@@ -50,4 +50,8 @@ public class Card {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private CardStatus status;  // ISSUED, ACTIVE, BLOCKED
+
+    //added later
+    @OneToOne(mappedBy = "card", cascade = CascadeType.ALL)
+    private CardAccount cardAccount; // ✅ bidirectional mapping
 }

@@ -17,5 +17,5 @@ public class CardRequestDto {
     private String maskedCardNumber;
     private LocalDate expiryDate;
     private String cvvHash;
-    private String status; // ISSUED, ACTIVE, BLOCKED
+    //private String status; // ISSUED, ACTIVE, BLOCKED
 }
