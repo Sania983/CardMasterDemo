@@ -18,3 +18,7 @@ public class TransactionHoldDto {
     private LocalDateTime holdDate;
     private LocalDateTime releaseDate;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> f62a880ef216b474853d19d91cbe8eadacad758b
