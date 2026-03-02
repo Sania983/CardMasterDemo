@@ -1,7 +1,7 @@
 package com.CardMaster.exceptions.cias;
-
-public class ValidationException extends RuntimeException {
-    public ValidationException(String message) {
-        super(message);
+//NEEDED
+public class InvalidCreditLimitException extends RuntimeException {
+    public InvalidCreditLimitException() {
+        super("Credit limit must be provided and positive");
     }
 }

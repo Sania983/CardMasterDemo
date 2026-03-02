@@ -1,49 +1,64 @@
 package com.CardMaster.exceptions.cias;
 
-import com.CardMaster.exceptions.cias.EntityNotFoundException;
-import com.CardMaster.exceptions.cias.ValidationException;
-import com.CardMaster.exceptions.cias.UnauthorizedActionException;
-import com.CardMaster.dto.iam.ResponseStructure; // CIAS-specific ResponseStructure
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice(basePackages = {
-        "com.CardMaster.service.cias",        // CardIssuance module
-        "com.CardMaster.service.accountsetup" // AccountSetup module
-})
-public class GlobalExceptionHandlerCias {
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ResponseStructure<String>> handleNotFound(EntityNotFoundException ex) {
-        ResponseStructure<String> res = new ResponseStructure<>();
-        res.setMsg("Entity Not Found");
-        res.setData(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    // Handle validation errors (@Valid DTOs)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", HttpStatus.BAD_REQUEST.value());
+        errorResponse.put("error", "Validation Error");
+        errorResponse.put("messages", ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                .collect(Collectors.toList()));
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ResponseStructure<String>> handleValidation(ValidationException ex) {
-        ResponseStructure<String> res = new ResponseStructure<>();
-        res.setMsg("Validation Error");
-        res.setData(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+    // Handle IllegalArgumentException (e.g., not found, invalid input)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", HttpStatus.BAD_REQUEST.value());
+        errorResponse.put("error", "Bad Request");
+        errorResponse.put("message", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UnauthorizedActionException.class)
-    public ResponseEntity<ResponseStructure<String>> handleUnauthorized(UnauthorizedActionException ex) {
-        ResponseStructure<String> res = new ResponseStructure<>();
-        res.setMsg("Unauthorized Action");
-        res.setData(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    // Handle custom CardIssuanceException
+    @ExceptionHandler(CardIssuanceException.class)
+    public ResponseEntity<Map<String, Object>> handleCardIssuance(CardIssuanceException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", HttpStatus.UNPROCESSABLE_ENTITY.value());
+        errorResponse.put("error", "Card Issuance Error");
+        errorResponse.put("message", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    // Handle all other exceptions (fallback)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ResponseStructure<String>> handleGeneric(Exception ex) {
-        ResponseStructure<String> res = new ResponseStructure<>();
-        res.setMsg("Internal Server Error");
-        res.setData(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+    public ResponseEntity<Map<String, Object>> handleGeneral(Exception ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        errorResponse.put("error", "Internal Server Error");
+        errorResponse.put("message", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

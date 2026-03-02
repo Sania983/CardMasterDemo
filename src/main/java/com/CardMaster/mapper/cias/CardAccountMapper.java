@@ -1,10 +1,11 @@
 package com.CardMaster.mapper.cias;
 
-import com.CardMaster.model.cias.CardAccount;
-import com.CardMaster.Enum.cias.AccountStatus;
 import com.CardMaster.dto.cias.CardAccountRequestDto;
 import com.CardMaster.dto.cias.CardAccountResponseDto;
+import com.CardMaster.dto.cias.CardResponseDto;
 import com.CardMaster.model.cias.Card;
+import com.CardMaster.model.cias.CardAccount;
+import com.CardMaster.Enum.cias.AccountStatus;
 import com.CardMaster.dao.cias.CardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ public class CardAccountMapper {
 
     private final CardRepository cardRepository;
 
+    // Convert Request DTO -> Entity
     public CardAccount toEntity(CardAccountRequestDto dto) {
         Card card = cardRepository.findById(dto.getCardId())
                 .orElseThrow(() -> new IllegalArgumentException("Card not found with ID: " + dto.getCardId()));
@@ -24,23 +26,32 @@ public class CardAccountMapper {
         CardAccount account = new CardAccount();
         account.setCard(card);
         account.setCreditLimit(dto.getCreditLimit());
-        account.setAvailableLimit(dto.getAvailableLimit());
-        //account.setStatus(AccountStatus.valueOf(dto.getStatus().toUpperCase()));
-        //later added
-        account.setOpenDate(LocalDate.now()); // ✅ enforce openDate
-        account.setStatus(AccountStatus.ACTIVE); // ✅ enforce ACTIVE at creation
-        //till here
+        account.setAvailableLimit(dto.getAvailableLimit() != null ? dto.getAvailableLimit() : dto.getCreditLimit());
+        account.setOpenDate(LocalDate.now());
+        account.setStatus(AccountStatus.ACTIVE); // enforce ACTIVE at creation
         return account;
     }
 
+    // Convert Entity -> Response DTO
     public CardAccountResponseDto toDTO(CardAccount account) {
+        Card card = account.getCard();
+
+        CardResponseDto cardDto = new CardResponseDto();
+        cardDto.setCardId(card.getCardId());
+        cardDto.setCustomerId(card.getCustomer().getCustomerId());
+        cardDto.setProductId(card.getProduct().getProductId());
+        cardDto.setMaskedCardNumber(card.getMaskedCardNumber());
+        cardDto.setExpiryDate(card.getExpiryDate());
+        cardDto.setStatus(card.getStatus().name());
+
         CardAccountResponseDto dto = new CardAccountResponseDto();
         dto.setAccountId(account.getAccountId());
-        dto.setCardId(account.getCard().getCardId());
+        dto.setCardId(card.getCardId());
         dto.setCreditLimit(account.getCreditLimit());
         dto.setAvailableLimit(account.getAvailableLimit());
         dto.setOpenDate(account.getOpenDate());
         dto.setStatus(account.getStatus().name());
+        dto.setCard(cardDto); // ✅ nested card details
         return dto;
     }
 }
