@@ -11,7 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/applications")
@@ -62,7 +65,31 @@ public class CardApplicationController {
 
         log.info("Fetching applications for customer {}", customerId);
         List<CardApplicationDto> apps = applicationService.getApplicationsByCustomer(customerId, token);
+
+        if (apps == null || apps.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseStructure<>("Customer doesn't have any applications", null));
+        }
+
         return ResponseEntity.ok(new ResponseStructure<>("Applications retrieved successfully", apps));
+    }
+
+    @GetMapping("/{id}/status")
+    public ResponseEntity<ResponseStructure<Object>> getStatus(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String token) {
+
+        log.info("Fetching status for application {}", id);
+        CardApplicationDto dto = applicationService.findById(id, token);
+
+        // Build a small response object with just id + status
+        Map<String, Object> statusResponse = new HashMap<>();
+        statusResponse.put("applicationId", dto.getApplicationId());
+        statusResponse.put("status", dto.getStatus());
+
+        return ResponseEntity.ok(
+                new ResponseStructure<>("Application status retrieved successfully", statusResponse)
+        );
     }
 
     // --- Update Application Status ---
@@ -77,14 +104,5 @@ public class CardApplicationController {
         return ResponseEntity.ok(new ResponseStructure<>("Application status updated successfully", updated));
     }
 
-    // --- Delete Application ---
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseStructure<Void>> deleteApplication(
-            @PathVariable Long id,
-            @RequestHeader("Authorization") String token) {
 
-        log.info("Deleting application {}", id);
-        applicationService.deleteApplication(id, token);
-        return ResponseEntity.ok(new ResponseStructure<>("Application deleted successfully", null));
-    }
 }

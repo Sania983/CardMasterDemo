@@ -1,5 +1,6 @@
 package com.CardMaster.service.paa;
 
+import com.CardMaster.Enum.cau.UnderwritingDecisionType;
 import com.CardMaster.dao.cpl.CardProductRepository;
 import com.CardMaster.dao.paa.CardApplicationRepository;
 import com.CardMaster.dao.paa.CustomerRepository;
@@ -35,6 +36,7 @@ CardApplicationService {
     private final UnderwritingService underwritingService;
     private final JwtUtil jwtUtil;
 
+
     // --- Create Application ---
     public CardApplicationDto create(CardApplicationDto dto, String token) {
         jwtUtil.extractUsername(token.substring(7)); // validate token
@@ -45,8 +47,7 @@ CardApplicationService {
 
         List<CardApplication> existingApps = applicationRepository.findByCustomerCustomerId(dto.getCustomerId());
         boolean hasActive = existingApps.stream()
-                .anyMatch(app -> app.getStatus() == CardApplication.CardApplicationStatus.Submitted
-                        || app.getStatus() == CardApplication.CardApplicationStatus.Approved);
+                .anyMatch(app -> app.getStatus() == CardApplication.CardApplicationStatus.Submitted);
         if (hasActive) {
             throw new ApplicationNotFoundException("Customer already has an active application. Only one allowed.");
         }
@@ -94,37 +95,25 @@ CardApplicationService {
         return dtos;
     }
 
-    // --- Update Application Status ---
+
     public CardApplicationDto updateApplicationStatus(Long appId, String status, String token) {
-            jwtUtil.extractUsername(token.substring(7)); // validate token
-
-            CardApplication app = applicationRepository.findById(appId)
-                    .orElseThrow(() -> new ApplicationNotFoundException("Application not found with id: " + appId));
-
-            // Build underwriting request
-            UnderwritingDecisionRequest req = new UnderwritingDecisionRequest();
-            req.setDecision(status != null ? Enum.valueOf(com.CardMaster.Enum.cau.UnderwritingDecisionType.class, status.toUpperCase()) : null);
-            req.setApprovedLimit(app.getRequestedLimit());
-            req.setRemarks("Decision triggered via CardApplicationService");
-
-            // Delegate to underwriting service
-            UnderwritingDecisionResponse decisionResponse =
-                    underwritingService.createDecision(appId, req, "Bearer " + token);
-
-            // Application status is updated inside underwriting service
-            CardApplication updated = applicationRepository.findById(appId)
-                    .orElseThrow(() -> new ApplicationNotFoundException("Application not found after decision"));
-
-            return EntityMapper.toCardApplicationDto(updated);
-        }
-
-    // --- Delete Application ---
-    public void deleteApplication(Long id, String token) {
         jwtUtil.extractUsername(token.substring(7)); // validate token
 
-        if (!applicationRepository.existsById(id)) {
-            throw new ApplicationNotFoundException("Application not found with id: " + id);
+        CardApplication app = applicationRepository.findById(appId)
+                .orElseThrow(() -> new ApplicationNotFoundException("Application not found with id: " + appId));
+
+        String normalized = status.toUpperCase();
+
+        if ("SUBMITTED".equals(normalized)) {
+            app.setStatus(CardApplication.CardApplicationStatus.Submitted);
+            applicationRepository.save(app);
+        } else if ("UNDERREVIEW".equals(normalized)) {
+            app.setStatus(CardApplication.CardApplicationStatus.UnderReview);
+            applicationRepository.save(app);
+        } else {
+            throw new IllegalArgumentException("Only SUBMITTED or UNDERREVIEW can be set via this endpoint");
         }
-        applicationRepository.deleteById(id);
+
+        return EntityMapper.toCardApplicationDto(app);
     }
 }
