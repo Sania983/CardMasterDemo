@@ -82,4 +82,3 @@ public class CardIssuanceService {
         return cardRepository.save(card);
     }
 }
-

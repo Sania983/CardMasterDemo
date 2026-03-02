@@ -30,6 +30,8 @@ public class TransactionController {
     }
 
     /**
+<<<<<<< HEAD
+=======
      * Post (capture) a previously authorized transaction by its ID.
      */
     @PostMapping("/post/{id}")
@@ -39,6 +41,7 @@ public class TransactionController {
     }
 
     /**
+>>>>>>> 9cc478afe2c2d784737a60c770cf924f466c713b
      * Reverse a transaction (void an auth or reverse a posted transaction).
      */
     @PostMapping("/reverse/{id}")

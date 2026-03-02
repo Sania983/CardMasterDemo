@@ -8,6 +8,10 @@ import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 
+
+/**
+ * Data Transfer Object for Statement entity.
+ */
 @Data
 @Builder
 @NoArgsConstructor
