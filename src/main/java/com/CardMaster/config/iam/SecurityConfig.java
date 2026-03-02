@@ -35,13 +35,7 @@ public class SecurityConfig {
                         // Admin-only endpoints
                         .requestMatchers("/users", "/users/*", "/auditlogs/**").hasAnyRole("ADMIN", "UNDERWRITER")
 
-
-                        .requestMatchers("/users", "/users/*", "/auditlogs/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/applications/**").hasAnyRole("CUSTOMER","ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/applications/**").hasAnyRole("UNDERWRITER","ADMIN","CUSTOMER")
-                        .requestMatchers(HttpMethod.PUT, "/applications/**").hasAnyRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/applications/**").hasRole("ADMIN")
-
+                        .requestMatchers(HttpMethod.PUT, "/applications/*/scores").hasRole("UNDERWRITER")
                         // Scores (POST + GET)
                         .requestMatchers(
                                 "/applications/*/scores",
@@ -53,6 +47,14 @@ public class SecurityConfig {
                                 "/applications/*/decisions",
                                 "/applications/*/decisions/latest"
                         ).hasRole("UNDERWRITER")
+                        .requestMatchers("/users", "/users/*", "/auditlogs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/applications/**").hasAnyRole("CUSTOMER","ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/applications/**").hasAnyRole("UNDERWRITER","ADMIN","CUSTOMER")
+                        .requestMatchers(HttpMethod.PUT, "/applications/**").hasAnyRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/applications/**").hasRole("ADMIN")
+
+
 
 
                         // All other endpoints require authentication

@@ -1,5 +1,6 @@
 package com.CardMaster.model.paa;
 
+import com.CardMaster.model.cau.UnderwritingDecision;
 import com.CardMaster.model.cpl.CardProduct;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,6 +40,8 @@ public class CardApplication {
     // Cascade ensures documents are persisted/removed with application
     @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Document> documents;
+    @OneToOne(mappedBy = "applicationid", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private UnderwritingDecision decision;
 
     public enum CardApplicationStatus {
         Submitted, UnderReview, Approved, Rejected
