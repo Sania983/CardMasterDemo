@@ -4,7 +4,6 @@ import com.CardMaster.dao.cias.CardRepository;
 import com.CardMaster.dao.cias.CardAccountRepository;
 import com.CardMaster.dao.cpl.CardProductRepository;
 import com.CardMaster.dao.paa.CustomerRepository;
-import com.CardMaster.exceptions.cias.CardIssuanceException;
 import com.CardMaster.model.cias.Card;
 import com.CardMaster.model.cias.CardAccount;
 import com.CardMaster.model.cpl.CardProduct;

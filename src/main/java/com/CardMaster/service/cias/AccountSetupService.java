@@ -1,6 +1,12 @@
 package com.CardMaster.service.cias;
 
 import com.CardMaster.Enum.cias.AccountStatus;
+import com.CardMaster.Enum.cias.CardStatus;
+import com.CardMaster.dao.cias.CardRepository;
+import com.CardMaster.dto.cias.CardAccountRequestDto;
+import com.CardMaster.dto.cias.CardAccountResponseDto;
+import com.CardMaster.mapper.cias.CardAccountMapper;
+import com.CardMaster.model.cias.Card;
 import com.CardMaster.model.cias.CardAccount;
 import com.CardMaster.dao.cias.CardAccountRepository;
 import com.CardMaster.security.iam.JwtUtil; // assuming you have this utility
@@ -16,29 +22,22 @@ import java.util.List;
 public class AccountSetupService {
 
     private final CardAccountRepository accountRepository;
-    private final JwtUtil jwtUtil;
+    private final CardRepository cardRepository;
+    private final CardAccountMapper accountMapper;
 
-    // Create a new account with JWT validation
-    public CardAccount createAccount(CardAccount account,String token) {
-        // Validate JWT
-        jwtUtil.extractUsername(token.substring(7));
+    public CardAccount createAccount(CardAccountRequestDto requestDto) {
+        CardAccount account = accountMapper.toEntity(requestDto);
 
-        if (account.getCreditLimit() == null || account.getCreditLimit() <= 0) {
-            throw new AccountSetupException("Credit limit must be provided and positive");
-        }
-        account.setAvailableLimit(account.getCreditLimit());
-        account.setOpenDate(LocalDate.now());
-        account.setStatus(AccountStatus.ACTIVE);
+        // After account creation, card becomes ACTIVE
+        Card card = account.getCard();
+        card.setStatus(CardStatus.ACTIVE);
+        cardRepository.save(card);
+
         return accountRepository.save(account);
     }
 
-    // Fetch all accounts
-    public List<CardAccount> getAllAccounts() {
-        return accountRepository.findAll();
-    }
-
-    // Fetch account by ID
     public CardAccount getAccountById(Long accountId) {
-        return accountRepository.findById(accountId).orElse(null);
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new IllegalArgumentException("Account not found with ID: " + accountId));
     }
 }

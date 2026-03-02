@@ -1,4 +1,11 @@
 package com.CardMaster.exceptions.cias;
 
-public class xxxxxx {
+public class CardIssuanceException extends RuntimeException {
+    public CardIssuanceException(String message) {
+        super(message);
+    }
+
+    public CardIssuanceException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

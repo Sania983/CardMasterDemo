@@ -51,7 +51,6 @@ public class Card {
     @Column(name = "status", nullable = false)
     private CardStatus status;  // ISSUED, ACTIVE, BLOCKED
 
-    //added later
     @OneToOne(mappedBy = "card", cascade = CascadeType.ALL)
-    private CardAccount cardAccount; // ✅ bidirectional mapping
+    private CardAccount cardAccount; // bidirectional mapping
 }
