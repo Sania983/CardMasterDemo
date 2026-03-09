@@ -1,96 +1,108 @@
 package com.CardMaster.controller.iam;
 
 import com.CardMaster.Enum.iam.UserEnum;
+import com.CardMaster.dto.iam.ResponseStructure;
+import com.CardMaster.dto.iam.UserDto;
+import com.CardMaster.mapper.iam.UserMapper;
 import com.CardMaster.model.iam.User;
 import com.CardMaster.security.iam.JwtUtil;
 import com.CardMaster.service.iam.UserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@WebMvcTest(UserController.class)
 class UserControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private UserService userService;
 
-    @MockBean
+    @Mock
     private JwtUtil jwtUtil;
 
-    @Test
-    void testGetAllUsers() throws Exception {
-        User user = new User(1L, "Priya", UserEnum.CUSTOMER,
+    @InjectMocks
+    private UserController userController;
+
+    private User user;
+    private UserDto userDto;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+        user = new User(1L, "Priya", UserEnum.CUSTOMER,
                 "priya@example.com", "9876543210", "secret123");
 
-        when(userService.getAllUsers()).thenReturn(List.of());
+        userDto = new UserDto();
+        userDto.setUserId(1L);
+        userDto.setName("Priya");
+        userDto.setEmail("priya@example.com");
+        userDto.setPhone("9876543210");
+        userDto.setRole(UserEnum.CUSTOMER);
 
-        mockMvc.perform(get("/users"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.msg").value("Users Retrieved Successfully"));
     }
 
     @Test
-    void testGetUserById() throws Exception {
-        User user = new User(1L, "Priya", UserEnum.CUSTOMER,
-                "priya@example.com", "9876543210", "secret123");
+    void testGetAllUsers() {
+        when(userService.getAllUsers()).thenReturn(List.of(userDto));
 
+        ResponseEntity<ResponseStructure<List<UserDto>>> result = userController.getAllUsers();
+
+        assertEquals("Users Retrieved Successfully", result.getBody().getMsg());
+        assertEquals(1, result.getBody().getData().size());
+        verify(userService, times(1)).getAllUsers();
+    }
+
+    @Test
+    void testGetUserById() {
         when(userService.getUserById(1L)).thenReturn(user);
 
-        mockMvc.perform(get("/users/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.msg").value("User Retrieved Successfully"))
-                .andExpect(jsonPath("$.data.name").value("Priya"));
+        ResponseEntity<ResponseStructure<UserDto>> result = userController.getUserById(1L);
+
+        assertEquals("User Retrieved Successfully", result.getBody().getMsg());
+        assertEquals("Priya", result.getBody().getData().getName());
+        verify(userService, times(1)).getUserById(1L);
     }
 
     @Test
-    void testRegisterUser() throws Exception {
-        User user = new User(1L, "Priya", UserEnum.CUSTOMER,
-                "priya@example.com", "9876543210", "secret123");
+    void testRegisterUser() {
+        when(userService.registerUser(user)).thenReturn(user);
 
-        when(userService.registerUser(any(User.class))).thenReturn(user);
+        ResponseEntity<ResponseStructure<UserDto>> result = userController.register(user);
 
-        mockMvc.perform(post("/users/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Priya\",\"email\":\"priya@example.com\",\"phone\":\"9876543210\",\"password\":\"secret123\"}"))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.msg").value("User created successfully"))
-                .andExpect(jsonPath("$.data.name").value("Priya"));
+        assertEquals("User created successfully", result.getBody().getMsg());
+        assertEquals("Priya", result.getBody().getData().getName());
+        verify(userService, times(1)).registerUser(user);
     }
 
     @Test
-    void testLoginUser() throws Exception {
+    void testLoginUser() {
         when(userService.loginUser(1L, "secret123")).thenReturn("mockToken");
 
-        mockMvc.perform(post("/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"userId\":1,\"password\":\"secret123\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.msg").value("Login Successful"))
-                .andExpect(jsonPath("$.data").value("Bearer mockToken"));
+        ResponseEntity<ResponseStructure<String>> result = userController.login(user);
+
+        assertEquals("Login Successful", result.getBody().getMsg());
+        assertEquals("Bearer mockToken", result.getBody().getData());
+        verify(userService, times(1)).loginUser(1L, "secret123");
     }
 
     @Test
-    void testLogoutUser() throws Exception {
+    void testLogoutUser() {
         when(jwtUtil.extractUserId("mockToken")).thenReturn(1L);
 
-        mockMvc.perform(post("/users/logout")
-                        .header("Authorization", "Bearer mockToken"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.msg").value("Logout Successful"))
-                .andExpect(jsonPath("$.data").value("Goodbye 1"));
+        ResponseEntity<ResponseStructure<String>> result =
+                userController.logout("Bearer mockToken");
+
+        assertEquals("Logout Successful", result.getBody().getMsg());
+        assertEquals("Goodbye 1", result.getBody().getData());
+        verify(jwtUtil, times(1)).extractUserId("mockToken");
+        verify(userService, times(1)).logoutUser(1L);
     }
 }
