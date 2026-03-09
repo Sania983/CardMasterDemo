@@ -12,10 +12,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CardResponseDto {
-    private Long cardId;
-    private Long customerId;
-    private Long productId;
-    private String maskedCardNumber;
-    private LocalDate expiryDate;
-    private String status; // ISSUED, ACTIVE, BLOCKED
+        private Long cardId;
+        private Long customerId;
+        private Long productId;
+        private String maskedCardNumber;
+        private LocalDate expiryDate;
+        private String status; // ISSUED, ACTIVE, BLOCKED
+
+
 }

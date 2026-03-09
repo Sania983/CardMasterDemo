@@ -19,6 +19,4 @@ public class CardAccountResponseDto {
     private LocalDate openDate;
     private String status; // ACTIVE, CLOSED
 
-    // ✅ Add nested card details
-    private CardResponseDto card;
 }

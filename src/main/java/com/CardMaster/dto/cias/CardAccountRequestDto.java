@@ -19,6 +19,5 @@ public class CardAccountRequestDto {
     @Positive(message = "Credit limit must be positive")
     private Double creditLimit;
 
-    private Double availableLimit;
-    private String status; // ACTIVE, CLOSED
+
 }
