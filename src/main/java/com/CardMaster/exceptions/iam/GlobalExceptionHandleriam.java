@@ -27,7 +27,7 @@ public class GlobalExceptionHandleriam {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
     }
 
-    // ✅ Handle Access Denied (role mismatch)
+    // Handle Access Denied (role mismatch)
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ResponseStructure<String>> handleAccessDenied(AccessDeniedException ex) {
         ResponseStructure<String> res = new ResponseStructure<>();
@@ -36,7 +36,7 @@ public class GlobalExceptionHandleriam {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }
 
-    // ✅ Handle missing authentication (no token)
+    //  Handle missing authentication (no token)
     @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
     public ResponseEntity<ResponseStructure<String>> handleAuthMissing(AuthenticationCredentialsNotFoundException ex) {
         ResponseStructure<String> res = new ResponseStructure<>();

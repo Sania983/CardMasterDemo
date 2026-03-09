@@ -28,12 +28,6 @@ public class CustomExceptions {
         }
     }
 
-    // --- Duplicate Application ---
-    public static class DuplicateApplicationException extends RuntimeException {
-        public DuplicateApplicationException(String message) {
-            super(message);
-        }
-    }
 
     // --- Duplicate Document ---
     public static class DuplicateDocumentException extends RuntimeException {
