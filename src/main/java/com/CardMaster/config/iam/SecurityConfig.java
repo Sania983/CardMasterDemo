@@ -52,11 +52,6 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/applications/**").hasAnyRole("UNDERWRITER","ADMIN","CUSTOMER")
                         .requestMatchers(HttpMethod.PUT, "/applications/**").hasAnyRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/applications/**").hasRole("ADMIN")
-
-
-
-
                         // All other endpoints require authentication
                         .anyRequest().authenticated()
                 )
