@@ -1,0 +1,85 @@
+package com.CardMaster.service.cias;
+
+import com.CardMaster.Enum.cias.CardStatus;
+import com.CardMaster.dao.cias.CardRepository;
+import com.CardMaster.dto.cias.CardRequestDto;
+import com.CardMaster.mapper.cias.CardMapper;
+import com.CardMaster.model.cias.Card;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class CardIssuanceServiceTest {
+
+    @Mock
+    private CardRepository cardRepository;
+
+    @Mock
+    private CardMapper cardMapper;
+
+    @InjectMocks
+    private CardIssuanceService cardService;
+
+    private CardRequestDto requestDto;
+    private Card card;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+        requestDto = new CardRequestDto();
+        requestDto.setCustomerId(1L);
+        requestDto.setProductId(1L);
+        requestDto.setMaskedCardNumber("**** **** **** 1234");
+        requestDto.setExpiryDate(LocalDate.of(2030, 12, 31));
+        requestDto.setCvvHash("hashed-cvv");
+
+        card = new Card();
+        card.setCardId(1L);
+        card.setMaskedCardNumber("**** **** **** 1234");
+        card.setExpiryDate(LocalDate.of(2030, 12, 31));
+        card.setStatus(CardStatus.ISSUED);
+    }
+
+    @Test
+    void testCreateCard() {
+        when(cardMapper.toEntity(requestDto)).thenReturn(card);
+        when(cardRepository.save(card)).thenReturn(card);
+
+        Card result = cardService.createCard(requestDto);
+
+        assertNotNull(result);
+        assertEquals(CardStatus.ISSUED, result.getStatus());
+        verify(cardRepository, times(1)).save(card);
+    }
+
+    @Test
+    void testGetCardById() {
+        when(cardRepository.findById(1L)).thenReturn(Optional.of(card));
+
+        Card result = cardService.getCardById(1L);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getCardId());
+        verify(cardRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void testBlockCard() {
+        when(cardRepository.findById(1L)).thenReturn(Optional.of(card));
+        when(cardRepository.save(card)).thenReturn(card);
+
+        Card result = cardService.blockCard(1L);
+
+        assertEquals(CardStatus.BLOCKED, result.getStatus());
+        verify(cardRepository, times(1)).save(card);
+    }
+}

@@ -8,7 +8,6 @@ import com.CardMaster.dao.cias.CardAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-
 @Component
 @RequiredArgsConstructor
 public class StatementMapper {
@@ -27,7 +26,7 @@ public class StatementMapper {
         st.setTotalDue(dto.getTotalDue());
         st.setMinimumDue(dto.getMinimumDue());
         st.setGeneratedDate(dto.getGeneratedDate());
-        st.setStatus(StatementStatus.valueOf(dto.getStatus().name()));
+        st.setStatus(dto.getStatus()); // already an enum, no need for valueOf
         return st;
     }
 

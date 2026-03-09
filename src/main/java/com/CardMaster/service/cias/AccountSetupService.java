@@ -1,44 +1,64 @@
 package com.CardMaster.service.cias;
 
 import com.CardMaster.Enum.cias.AccountStatus;
-import com.CardMaster.model.cias.CardAccount;
+import com.CardMaster.Enum.cias.CardStatus;
+import com.CardMaster.dao.cias.CardRepository;
 import com.CardMaster.dao.cias.CardAccountRepository;
-import com.CardMaster.security.iam.JwtUtil; // assuming you have this utility
+import com.CardMaster.dto.cias.CardAccountRequestDto;
+import com.CardMaster.mapper.cias.CardAccountMapper;
+import com.CardMaster.model.cias.Card;
+import com.CardMaster.model.cias.CardAccount;
 import lombok.RequiredArgsConstructor;
-import com.CardMaster.exceptions.cias.AccountSetupException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AccountSetupService {
 
     private final CardAccountRepository accountRepository;
-    private final JwtUtil jwtUtil;
+    private final CardRepository cardRepository;
+    private final CardAccountMapper accountMapper;
 
-    // Create a new account with JWT validation
-    public CardAccount createAccount(CardAccount account,String token) {
-        // Validate JWT
-        jwtUtil.extractUsername(token.substring(7));
+    public CardAccount createAccount(CardAccountRequestDto requestDto) {
+        Card card = cardRepository.findById(requestDto.getCardId())
+                .orElseThrow(() -> new IllegalArgumentException("Card not found with ID: " + requestDto.getCardId()));
 
-        if (account.getCreditLimit() == null || account.getCreditLimit() <= 0) {
-            throw new AccountSetupException("Credit limit must be provided and positive");
+        if (card.getStatus() != CardStatus.ISSUED) {
+            throw new IllegalStateException("Card must be ISSUED before linking to an account");
         }
-        account.setAvailableLimit(account.getCreditLimit());
-        account.setOpenDate(LocalDate.now());
+
+        CardAccount account = new CardAccount();
+        account.setCard(card);
+        account.setCreditLimit(requestDto.getCreditLimit());
+        account.setAvailableLimit(requestDto.getCreditLimit());
+        account.setOpenDate(LocalDate.now()); // auto-set today's date
         account.setStatus(AccountStatus.ACTIVE);
+
+        // activate card
+        card.setStatus(CardStatus.ACTIVE);
+        cardRepository.save(card);
+
         return accountRepository.save(account);
     }
 
-    // Fetch all accounts
-    public List<CardAccount> getAllAccounts() {
-        return accountRepository.findAll();
+    public CardAccount getAccountById(Long accountId) {
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new IllegalArgumentException("Account not found with ID: " + accountId));
     }
 
-    // Fetch account by ID
-    public CardAccount getAccountById(Long accountId) {
-        return accountRepository.findById(accountId).orElse(null);
+    public CardAccount useCard(Long accountId, Double amount) {
+        CardAccount account = getAccountById(accountId);
+
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        if (account.getAvailableLimit() < amount) {
+            throw new IllegalStateException("Insufficient available limit");
+        }
+
+        account.setAvailableLimit(account.getAvailableLimit() - amount);
+        return accountRepository.save(account);
     }
 }

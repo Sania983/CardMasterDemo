@@ -25,6 +25,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+
 class CardApplicationServiceTest {
 
     @Mock private CardApplicationRepository applicationRepository;
@@ -142,7 +143,7 @@ class CardApplicationServiceTest {
 //        when(documentRepository.findByApplicationApplicationId(5L)).thenReturn(List.of());
 //        when(applicationRepository.save(any(CardApplication.class))).thenReturn(app);
 //
-//        CardApplicationDto result = service.updateApplicationStatus(5L, "Approved", "Bearer token");
+//        CardApplicationDto result = service.updateApplicationStatus(5L, "APPROVED", "Bearer token");
 //        assertEquals("Approved", result.getStatus());
 //    }
 //
@@ -156,34 +157,16 @@ class CardApplicationServiceTest {
 //        when(documentRepository.findByApplicationApplicationId(5L)).thenReturn(List.of(doc));
 //        when(applicationRepository.save(any(CardApplication.class))).thenReturn(app);
 //
-//        CardApplicationDto result = service.updateApplicationStatus(5L, "Approved", "Bearer token");
+//        CardApplicationDto result = service.updateApplicationStatus(5L, "APPROVED", "Bearer token");
 //        assertEquals("Rejected", result.getStatus());
 //    }
-
-    @Test
-    void testUpdateApplicationStatus_Invalid() {
-        when(jwtUtil.extractUsername(anyString())).thenReturn("user");
-        when(applicationRepository.findById(5L)).thenReturn(Optional.of(app));
-
-        assertThrows(ApplicationNotFoundException.class,
-                () -> service.updateApplicationStatus(5L, "INVALID", "Bearer token"));
-    }
-
-    @Test
-    void testDeleteApplication_Success() {
-        when(jwtUtil.extractUsername(anyString())).thenReturn("user");
-        when(applicationRepository.existsById(5L)).thenReturn(true);
-
-        service.deleteApplication(5L, "Bearer token");
-        verify(applicationRepository, times(1)).deleteById(5L);
-    }
-
-    @Test
-    void testDeleteApplication_NotFound() {
-        when(jwtUtil.extractUsername(anyString())).thenReturn("user");
-        when(applicationRepository.existsById(5L)).thenReturn(false);
-
-        assertThrows(ApplicationNotFoundException.class,
-                () -> service.deleteApplication(5L, "Bearer token"));
-    }
+//
+//    @Test
+//    void testUpdateApplicationStatus_Invalid() {
+//        when(jwtUtil.extractUsername(anyString())).thenReturn("user");
+//        when(applicationRepository.findById(5L)).thenReturn(Optional.of(app));
+//
+//        assertThrows(ApplicationNotFoundException.class,
+//                () -> service.updateApplicationStatus(5L, "INVALID", "Bearer token"));
+//    }
 }

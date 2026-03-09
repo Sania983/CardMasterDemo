@@ -1,36 +1,40 @@
 package com.CardMaster.controller.cias;
 
+import com.CardMaster.dto.cias.CardAccountRequestDto;
+import com.CardMaster.dto.cias.CardAccountResponseDto;
+import com.CardMaster.mapper.cias.CardAccountMapper;
 import com.CardMaster.model.cias.CardAccount;
 import com.CardMaster.service.cias.AccountSetupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/accounts")
 @RequiredArgsConstructor
 public class AccountSetupController {
 
-    private final AccountSetupService accountSetupService;
+    private final AccountSetupService accountService;
+    private final CardAccountMapper accountMapper;
 
-    // Create a new account
     @PostMapping
-    public ResponseEntity<CardAccount> createAccount(@RequestBody CardAccount account,@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(accountSetupService.createAccount(account, token));
+    public ResponseEntity<CardAccountResponseDto> createAccount(@RequestBody CardAccountRequestDto request) {
+        CardAccount account = accountService.createAccount(request);
+        return ResponseEntity.ok(accountMapper.toDTO(account));
     }
 
-    // Get all accounts
-    @GetMapping
-    public ResponseEntity<List<CardAccount>> getAllAccounts() {
-        return ResponseEntity.ok(accountSetupService.getAllAccounts());
+    @GetMapping("/{accountId}")
+    public ResponseEntity<CardAccountResponseDto> getAccount(@PathVariable Long accountId) {
+        CardAccount account = accountService.getAccountById(accountId);
+        return ResponseEntity.ok(accountMapper.toDTO(account));
     }
 
-    // Get account by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<CardAccount> getAccountById(@PathVariable Long id) {
-        return ResponseEntity.ok(accountSetupService.getAccountById(id));
+
+    @PostMapping("/use/{accountId}")
+    public ResponseEntity<CardAccountResponseDto> useCard(
+            @PathVariable Long accountId,
+            @RequestParam Double amount) {
+        CardAccount account = accountService.useCard(accountId, amount);
+        return ResponseEntity.ok(accountMapper.toDTO(account));
     }
 }

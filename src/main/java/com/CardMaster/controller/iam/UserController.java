@@ -81,7 +81,7 @@ public class UserController {
     // POST logout
     @PostMapping("/logout")
     public ResponseEntity<ResponseStructure<String>> logout(@RequestHeader("Authorization") String token) {
-        Long userId = jwtUtil.extractUserId(token.substring(7)); // ✅ returns Long
+        Long userId = jwtUtil.extractUserId(token.substring(7)); //  returns Long
         userService.logoutUser(userId); // ✅ pass directly
 
         ResponseStructure<String> r = new ResponseStructure<>();
