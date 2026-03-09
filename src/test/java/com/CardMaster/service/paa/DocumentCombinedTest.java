@@ -240,4 +240,62 @@ public class DocumentCombinedTest {
         assertTrue(found.isPresent());
         assertEquals(1, byApp.size());
     }
+    @Test
+    void testFindByApplicationApplicationId_NoResults() {
+        DocumentRepository mockRepo = mock(DocumentRepository.class);
+
+        when(mockRepo.findByApplicationApplicationId(99L)).thenReturn(List.of());
+
+        List<Document> result = mockRepo.findByApplicationApplicationId(99L);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testExistsById() {
+        DocumentRepository mockRepo = mock(DocumentRepository.class);
+
+        when(mockRepo.existsById(10L)).thenReturn(true);
+        when(mockRepo.existsById(99L)).thenReturn(false);
+
+        assertTrue(mockRepo.existsById(10L));
+        assertFalse(mockRepo.existsById(99L));
+    }
+
+    @Test
+    void testDeleteById() {
+        DocumentRepository mockRepo = mock(DocumentRepository.class);
+
+        doNothing().when(mockRepo).deleteById(10L);
+
+        mockRepo.deleteById(10L);
+        verify(mockRepo, times(1)).deleteById(10L);
+    }
+
+    @Test
+    void testFindAll() {
+        DocumentRepository mockRepo = mock(DocumentRepository.class);
+
+        CardApplication app = new CardApplication();
+        app.setApplicationId(1L);
+
+        Document doc1 = new Document();
+        doc1.setDocumentId(1L);
+        doc1.setApplication(app);
+        doc1.setStatus(Document.DocumentStatus.Submitted);
+        doc1.setDocumentType(Document.DocumentType.IdentityProof);
+
+        Document doc2 = new Document();
+        doc2.setDocumentId(2L);
+        doc2.setApplication(app);
+        doc2.setStatus(Document.DocumentStatus.Verified);
+        doc2.setDocumentType(Document.DocumentType.AddressProof);
+
+        when(mockRepo.findAll()).thenReturn(List.of(doc1, doc2));
+
+        List<Document> result = mockRepo.findAll();
+        assertEquals(2, result.size());
+        assertEquals(Document.DocumentType.IdentityProof, result.get(0).getDocumentType());
+        assertEquals(Document.DocumentType.AddressProof, result.get(1).getDocumentType());
+    }
+
 }
