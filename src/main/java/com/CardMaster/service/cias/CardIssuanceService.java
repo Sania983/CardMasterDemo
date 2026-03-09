@@ -16,7 +16,8 @@ public class CardIssuanceService {
     private final CardMapper cardMapper;
 
     public Card createCard(CardRequestDto requestDto) {
-        Card card = cardMapper.toEntity(requestDto); // status = ISSUED
+        Card card = cardMapper.toEntity(requestDto);
+        card.setStatus(CardStatus.ISSUED); // always ISSUED on creation
         return cardRepository.save(card);
     }
 
@@ -25,19 +26,9 @@ public class CardIssuanceService {
                 .orElseThrow(() -> new IllegalArgumentException("Card not found with ID: " + cardId));
     }
 
-    public Card activateCard(Long cardId) {
-        Card card = getCardById(cardId);
-        if (card.getStatus() != CardStatus.ISSUED) {
-            throw new IllegalStateException("Card must be ISSUED before activation");
-        }
-        card.setStatus(CardStatus.ACTIVE);
-        return cardRepository.save(card);
-    }
-
     public Card blockCard(Long cardId) {
         Card card = getCardById(cardId);
         card.setStatus(CardStatus.BLOCKED);
         return cardRepository.save(card);
     }
 }
-

@@ -7,10 +7,7 @@ import com.CardMaster.model.cias.CardAccount;
 import com.CardMaster.service.cias.AccountSetupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -29,6 +26,15 @@ public class AccountSetupController {
     @GetMapping("/{accountId}")
     public ResponseEntity<CardAccountResponseDto> getAccount(@PathVariable Long accountId) {
         CardAccount account = accountService.getAccountById(accountId);
+        return ResponseEntity.ok(accountMapper.toDTO(account));
+    }
+
+
+    @PostMapping("/use/{accountId}")
+    public ResponseEntity<CardAccountResponseDto> useCard(
+            @PathVariable Long accountId,
+            @RequestParam Double amount) {
+        CardAccount account = accountService.useCard(accountId, amount);
         return ResponseEntity.ok(accountMapper.toDTO(account));
     }
 }

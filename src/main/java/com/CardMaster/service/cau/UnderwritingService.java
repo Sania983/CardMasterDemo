@@ -40,12 +40,10 @@ public class UnderwritingService {
     private final UnderwritingDecisionRepository decisionRepository;
     private final CardApplicationRepository applicationRepository;
     private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;               // subject=username; userId & role are claims
+    private final JwtUtil jwtUtil;
     private final UnderwritingMapper mapper;
 
-    // ---------------------------------------------------------------------
-    // 1) CREATE CREDIT SCORE -> returns CreditScoreResponse DTO
-    // ---------------------------------------------------------------------
+
     public CreditScoreResponse generateScore(Long appId, CreditScoreGenerateRequest req) {
         CardApplication app = applicationRepository.findById(appId)
                 .orElseThrow(() -> new EntityNotFoundException("CardApplication", appId));
@@ -65,9 +63,7 @@ public class UnderwritingService {
         return mapper.toCreditScoreResponse(saved);
     }
 
-    // ---------------------------------------------------------------------
-    // 2) GET LATEST CREDIT SCORE -> returns CreditScoreResponse DTO
-    // ---------------------------------------------------------------------
+
     @Transactional(readOnly = true)
     public CreditScoreResponse getLatestScore(Long appId) {
         CreditScore latest = creditScoreRepository
@@ -77,19 +73,17 @@ public class UnderwritingService {
         return mapper.toCreditScoreResponse(latest);
     }
 
-    // ---------------------------------------------------------------------
-    // 3) CREATE DECISION (UNDERWRITER from JWT claims) -> returns DTO
-    // ---------------------------------------------------------------------
+
     public UnderwritingDecisionResponse createDecision(Long appId,
                                                        UnderwritingDecisionRequest req,
                                                        String authorizationHeader) {
-        // 3.1 Validate header format
+
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             throw new UnauthorizedActionException("Missing or invalid Authorization header");
         }
         String token = authorizationHeader.substring(7);
 
-        // 3.2 Validate token and read claims (subject is username; userId & role in claims)
+
         if (!jwtUtil.validateToken(token)) {
             throw new UnauthorizedActionException("Invalid or expired token");
         }
@@ -104,7 +98,7 @@ public class UnderwritingService {
             throw new UnauthorizedActionException("Only UNDERWRITER role can create decisions");
         }
 
-        // 3.3 Load user + role check (defense-in-depth)
+
         User underwriter = userRepository.findById(underwriterId)
                 .orElseThrow(() -> new EntityNotFoundException("User (underwriter) by id", underwriterId));
 
@@ -112,11 +106,11 @@ public class UnderwritingService {
             throw new UnauthorizedActionException("Only UNDERWRITER role can create decisions");
         }
 
-        // 3.4 Load application
+
         CardApplication app = applicationRepository.findById(appId)
                 .orElseThrow(() -> new EntityNotFoundException("CardApplication", appId));
 
-        // 3.5 Determine final decision & limit
+
         UnderwritingDecisionType finalDecision = req.getDecision();
         Double finalLimit = req.getApprovedLimit();
 
@@ -131,7 +125,7 @@ public class UnderwritingService {
                 finalLimit = app.getRequestedLimit();
             } else if (bureau < 600) {
                 finalDecision = UnderwritingDecisionType.REJECT;
-                finalLimit = 0.0; // ensure entity field has @PositiveOrZero
+                finalLimit = 0.0;
             } else {
                 finalDecision = UnderwritingDecisionType.CONDITIONAL;
                 finalLimit = (app.getRequestedLimit() != null) ? app.getRequestedLimit() * 0.5 : 0.0;
@@ -148,7 +142,7 @@ public class UnderwritingService {
             }
         }
 
-        // 3.6 Persist decision
+
         UnderwritingDecision decision = UnderwritingDecision.builder()
                 .applicationid(app)
                 .underwriterid(underwriter)
@@ -160,7 +154,7 @@ public class UnderwritingService {
 
         UnderwritingDecision saved = decisionRepository.save(decision);
 
-        // 3.7 Update application status
+
         switch (finalDecision) {
             case APPROVE     -> app.setStatus(CardApplication.CardApplicationStatus.Approved);
             case REJECT      -> app.setStatus(CardApplication.CardApplicationStatus.Rejected);
@@ -168,13 +162,11 @@ public class UnderwritingService {
         }
         applicationRepository.save(app);
 
-        // 3.8 Return DTO
+
         return mapper.toUnderwritingDecisionResponse(saved);
     }
 
-    // ---------------------------------------------------------------------
-    // 4) GET LATEST DECISION -> returns UnderwritingDecisionResponse DTO
-    // ---------------------------------------------------------------------
+
     @Transactional(readOnly = true)
     public UnderwritingDecisionResponse getLatestDecision(Long appId) {
         UnderwritingDecision latest = decisionRepository

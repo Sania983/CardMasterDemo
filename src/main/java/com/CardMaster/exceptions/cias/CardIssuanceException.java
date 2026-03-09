@@ -5,7 +5,4 @@ public class CardIssuanceException extends RuntimeException {
         super(message);
     }
 
-    public CardIssuanceException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

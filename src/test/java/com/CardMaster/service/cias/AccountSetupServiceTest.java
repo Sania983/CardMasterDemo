@@ -1,5 +1,6 @@
 package com.CardMaster.service.cias;
 
+import com.CardMaster.Enum.cias.AccountStatus;
 import com.CardMaster.Enum.cias.CardStatus;
 import com.CardMaster.dao.cias.CardAccountRepository;
 import com.CardMaster.dao.cias.CardRepository;
@@ -41,12 +42,9 @@ class AccountSetupServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        requestDto = CardAccountRequestDto.builder()
-                .cardId(1L)
-                .creditLimit(50000.0)
-                .availableLimit(50000.0)
-                .status("ACTIVE")
-                .build();
+        requestDto = new CardAccountRequestDto();
+        requestDto.setCardId(1L);
+        requestDto.setCreditLimit(50000.0);
 
         card = new Card();
         card.setCardId(1L);
@@ -60,20 +58,21 @@ class AccountSetupServiceTest {
         account.setCreditLimit(50000.0);
         account.setAvailableLimit(50000.0);
         account.setOpenDate(LocalDate.now());
+        account.setStatus(AccountStatus.ACTIVE);
     }
 
     @Test
-    void testCreateAccount() {
-        when(accountMapper.toEntity(requestDto)).thenReturn(account);
-        when(cardRepository.save(card)).thenReturn(card);
-        when(accountRepository.save(account)).thenReturn(account);
+    void testCreateAccountActivatesCard() {
+        when(cardRepository.findById(1L)).thenReturn(Optional.of(card));
+        when(accountRepository.save(any(CardAccount.class))).thenReturn(account);
 
         CardAccount result = accountSetupService.createAccount(requestDto);
 
         assertNotNull(result);
+        assertEquals(AccountStatus.ACTIVE, result.getStatus());
         assertEquals(CardStatus.ACTIVE, result.getCard().getStatus());
         verify(cardRepository, times(1)).save(card);
-        verify(accountRepository, times(1)).save(account);
+        verify(accountRepository, times(1)).save(any(CardAccount.class));
     }
 
     @Test
@@ -92,5 +91,24 @@ class AccountSetupServiceTest {
         when(accountRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> accountSetupService.getAccountById(99L));
+    }
+
+    @Test
+    void testUseCardReducesAvailableLimit() {
+        when(accountRepository.findById(10L)).thenReturn(Optional.of(account));
+        when(accountRepository.save(account)).thenReturn(account);
+
+        CardAccount result = accountSetupService.useCard(10L, 5000.0);
+
+        assertEquals(45000.0, result.getAvailableLimit());
+        verify(accountRepository, times(1)).save(account);
+    }
+
+    @Test
+    void testUseCardInsufficientLimit() {
+        account.setAvailableLimit(1000.0);
+        when(accountRepository.findById(10L)).thenReturn(Optional.of(account));
+
+        assertThrows(IllegalStateException.class, () -> accountSetupService.useCard(10L, 5000.0));
     }
 }

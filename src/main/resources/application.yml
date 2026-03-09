@@ -7,12 +7,12 @@ spring:
 
   jpa:
     show-sql: true
-    database-platform: org.hibernate.dialect.MySQLDialect   # <-- Hibernate 6/7 correct dialect
+    database-platform: org.hibernate.dialect.MySQLDialect   # <-- tells mysql is used
     hibernate:
-      ddl-auto: update                                      # <-- correct key (NOT dbl-auto)
+      ddl-auto: update                                      # <--  data definition language(sql)
     properties:
       hibernate:
-        format_sql: true
+        format_sql: true                                    #to follow sql format
 
 server:
   port: 8082
