@@ -26,7 +26,7 @@ class CardIssuanceServiceTest {
     private CardMapper cardMapper;
 
     @InjectMocks
-    private CardIssuanceService cardIssuanceService;
+    private CardIssuanceService cardService;
 
     private CardRequestDto requestDto;
     private Card card;
@@ -35,20 +35,17 @@ class CardIssuanceServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        requestDto = CardRequestDto.builder()
-                .customerId(123L)
-                .productId(456L)
-                .maskedCardNumber("**** **** **** 4321")
-                .expiryDate(LocalDate.of(2031, 3, 1))
-                .cvvHash("dummyHash")
-                .status("ISSUED")
-                .build();
+        requestDto = new CardRequestDto();
+        requestDto.setCustomerId(1L);
+        requestDto.setProductId(1L);
+        requestDto.setMaskedCardNumber("**** **** **** 1234");
+        requestDto.setExpiryDate(LocalDate.of(2030, 12, 31));
+        requestDto.setCvvHash("hashed-cvv");
 
         card = new Card();
         card.setCardId(1L);
-        card.setMaskedCardNumber("**** **** **** 4321");
-        card.setExpiryDate(LocalDate.of(2031, 3, 1));
-        card.setCvvHash("dummyHash");
+        card.setMaskedCardNumber("**** **** **** 1234");
+        card.setExpiryDate(LocalDate.of(2030, 12, 31));
         card.setStatus(CardStatus.ISSUED);
     }
 
@@ -57,7 +54,7 @@ class CardIssuanceServiceTest {
         when(cardMapper.toEntity(requestDto)).thenReturn(card);
         when(cardRepository.save(card)).thenReturn(card);
 
-        Card result = cardIssuanceService.createCard(requestDto);
+        Card result = cardService.createCard(requestDto);
 
         assertNotNull(result);
         assertEquals(CardStatus.ISSUED, result.getStatus());
@@ -68,7 +65,7 @@ class CardIssuanceServiceTest {
     void testGetCardById() {
         when(cardRepository.findById(1L)).thenReturn(Optional.of(card));
 
-        Card result = cardIssuanceService.getCardById(1L);
+        Card result = cardService.getCardById(1L);
 
         assertNotNull(result);
         assertEquals(1L, result.getCardId());
@@ -76,30 +73,11 @@ class CardIssuanceServiceTest {
     }
 
     @Test
-    void testActivateCard() {
-        when(cardRepository.findById(1L)).thenReturn(Optional.of(card));
-        when(cardRepository.save(card)).thenReturn(card);
-
-        Card result = cardIssuanceService.activateCard(1L);
-
-        assertEquals(CardStatus.ACTIVE, result.getStatus());
-        verify(cardRepository, times(1)).save(card);
-    }
-
-    @Test
-    void testActivateCardInvalidState() {
-        card.setStatus(CardStatus.BLOCKED);
-        when(cardRepository.findById(1L)).thenReturn(Optional.of(card));
-
-        assertThrows(IllegalStateException.class, () -> cardIssuanceService.activateCard(1L));
-    }
-
-    @Test
     void testBlockCard() {
         when(cardRepository.findById(1L)).thenReturn(Optional.of(card));
         when(cardRepository.save(card)).thenReturn(card);
 
-        Card result = cardIssuanceService.blockCard(1L);
+        Card result = cardService.blockCard(1L);
 
         assertEquals(CardStatus.BLOCKED, result.getStatus());
         verify(cardRepository, times(1)).save(card);

@@ -18,6 +18,7 @@ public class CardMapper {
     private final CustomerRepository customerRepository;
     private final CardProductRepository productRepository;
 
+    // Request DTO -> Entity
     public Card toEntity(CardRequestDto dto) {
         Customer customer = customerRepository.findById(dto.getCustomerId())
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found with ID: " + dto.getCustomerId()));
@@ -35,6 +36,7 @@ public class CardMapper {
         return card;
     }
 
+    // Entity -> Response DTO
     public CardResponseDto toDTO(Card card) {
         CardResponseDto dto = new CardResponseDto();
         dto.setCardId(card.getCardId());
