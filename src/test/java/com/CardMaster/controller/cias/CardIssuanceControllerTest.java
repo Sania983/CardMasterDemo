@@ -1,6 +1,5 @@
 package com.CardMaster.controller.cias;
 
-import com.CardMaster.controller.CardIssuanceController;
 import com.CardMaster.dto.cias.CardRequestDto;
 import com.CardMaster.dto.cias.CardResponseDto;
 import com.CardMaster.mapper.cias.CardMapper;
