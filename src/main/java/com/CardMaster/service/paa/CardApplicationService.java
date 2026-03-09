@@ -11,6 +11,7 @@ import com.CardMaster.dto.paa.CardApplicationDto;
 import com.CardMaster.exceptions.paa.ApplicationNotFoundException;
 import com.CardMaster.exceptions.paa.CustomerNotFoundException;
 import com.CardMaster.exceptions.cpl.NotFoundException;
+import com.CardMaster.exceptions.paa.DuplicateApplicationException;
 import com.CardMaster.mapper.paa.EntityMapper;
 import com.CardMaster.model.cpl.CardProduct;
 import com.CardMaster.model.paa.CardApplication;
@@ -49,7 +50,7 @@ CardApplicationService {
         boolean hasActive = existingApps.stream()
                 .anyMatch(app -> app.getStatus() == CardApplication.CardApplicationStatus.Submitted);
         if (hasActive) {
-            throw new ApplicationNotFoundException("Customer already has an active application. Only one allowed.");
+            throw new DuplicateApplicationException("Customer already has an active application. Only one allowed.");
         }
 
         CardProduct product = productRepo.findById(dto.getProductId())

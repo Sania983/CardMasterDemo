@@ -38,6 +38,11 @@ public class GlobalExceptionHandlerpaa {
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error: " + ex.getMessage());
     }
 
+    @ExceptionHandler(DuplicateApplicationException.class)
+    public ResponseEntity<Object> handleDuplicateApplication(DuplicateApplicationException ex) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     private ResponseEntity<Object> buildResponse(HttpStatus status, String message) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
