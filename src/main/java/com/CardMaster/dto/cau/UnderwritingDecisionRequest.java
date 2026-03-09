@@ -13,9 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UnderwritingDecisionRequest {
+
     private UnderwritingDecisionType decision;
-    @PositiveOrZero(message = "Approved limit cannot be negative")// optional: auto if null
-    private Double approvedLimit;// optional
+    @PositiveOrZero(message = "Approved limit cannot be negative")
+    private Double approvedLimit;
     @Size(max=500)
     private String remarks;
 }

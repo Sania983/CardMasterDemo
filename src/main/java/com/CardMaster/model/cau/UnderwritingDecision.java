@@ -39,6 +39,6 @@ public class UnderwritingDecision {
     @PositiveOrZero
     private Double approvedLimit;
     private String remarks;
-    @NotNull   //space is allowed
+    @NotNull
     private LocalDateTime decisionDate;
 }
