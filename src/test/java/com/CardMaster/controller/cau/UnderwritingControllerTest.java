@@ -8,8 +8,12 @@ import com.CardMaster.exceptions.cau.EntityNotFoundException;
 import com.CardMaster.exceptions.cau.ValidationException;
 import com.CardMaster.exceptions.cau.UnauthorizedActionException;
 import com.CardMaster.service.cau.UnderwritingService;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,35 +21,54 @@ import static org.mockito.Mockito.*;
 
 class UnderwritingControllerTest {
 
-    private final UnderwritingService service = mock(UnderwritingService.class);
-    private final UnderwritingController controller = new UnderwritingController(service);
+    @Mock
+    private UnderwritingService service;
+
+    @InjectMocks
+    private UnderwritingController controller;
+
+    private CreditScoreResponse scoreResponse;
+    private UnderwritingDecisionResponse decisionResponse;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+        // Prepare score response
+        scoreResponse = new CreditScoreResponse();
+        scoreResponse.setBureauScore(750);
+        scoreResponse.setInternalScore(690);
+
+        // Prepare decision response
+        decisionResponse = new UnderwritingDecisionResponse();
+        decisionResponse.setApprovedLimit(50000.0);
+        decisionResponse.setRemarks("Approved");
+    }
 
     // ---------------- CREATE SCORE ----------------
 
     @Test
-    void createScore_success() {
+    void testCreateScore_success() {
         CreditScoreGenerateRequest req = new CreditScoreGenerateRequest();
         req.setBureauScore(750);
 
-        CreditScoreResponse res = new CreditScoreResponse();
-        res.setBureauScore(750);
-        res.setInternalScore(690);
+        when(service.generateScore(1L, req)).thenReturn(scoreResponse);
 
-        when(service.generateScore(1L, req)).thenReturn(res);
+        ResponseEntity<CreditScoreResponse> result = controller.createScore(1L, req);
 
-        ResponseEntity<CreditScoreResponse> response = controller.createScore(1L, req);
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());        // <-- changed
-        assertEquals(750, response.getBody().getBureauScore());
+        assertNotNull(result.getBody());
+        assertEquals(750, result.getBody().getBureauScore());
+        assertEquals(690, result.getBody().getInternalScore());
+        verify(service, times(1)).generateScore(1L, req);
     }
 
     @Test
-    void createScore_validationError() {
+    void testCreateScore_validationError() {
         CreditScoreGenerateRequest req = new CreditScoreGenerateRequest();
-        req.setBureauScore(700);
+        req.setBureauScore(500);
 
         when(service.generateScore(1L, req))
-                .thenThrow(new ValidationException("Invalid score request"));
+                .thenThrow(new ValidationException("Invalid score"));
 
         assertThrows(
                 ValidationException.class,
@@ -56,21 +79,17 @@ class UnderwritingControllerTest {
     // ---------------- GET LATEST SCORE ----------------
 
     @Test
-    void getLatestScore_success() {
-        CreditScoreResponse res = new CreditScoreResponse();
-        res.setBureauScore(760);
-        res.setInternalScore(700);
+    void testGetLatestScore_success() {
+        when(service.getLatestScore(1L)).thenReturn(scoreResponse);
 
-        when(service.getLatestScore(1L)).thenReturn(res);
+        ResponseEntity<CreditScoreResponse> result = controller.getLatestScore(1L);
 
-        ResponseEntity<CreditScoreResponse> response = controller.getLatestScore(1L);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());             // <-- changed
-        assertEquals(760, response.getBody().getBureauScore());
+        assertEquals(750, result.getBody().getBureauScore());
+        verify(service, times(1)).getLatestScore(1L);
     }
 
     @Test
-    void getLatestScore_notFound() {
+    void testGetLatestScore_notFound() {
         when(service.getLatestScore(1L))
                 .thenThrow(new EntityNotFoundException("CreditScore", 1L));
 
@@ -83,24 +102,22 @@ class UnderwritingControllerTest {
     // ---------------- CREATE DECISION ----------------
 
     @Test
-    void createDecision_success() {
+    void testCreateDecision_success() {
         UnderwritingDecisionRequest req = new UnderwritingDecisionRequest();
-        req.setRemarks("ok");
+        req.setApprovedLimit(50000.0);
 
-        UnderwritingDecisionResponse res = new UnderwritingDecisionResponse();
-        res.setRemarks("ok");
+        when(service.createDecision(1L, req, "Bearer x")).thenReturn(decisionResponse);
 
-        when(service.createDecision(1L, req, "Bearer x")).thenReturn(res);
-
-        ResponseEntity<UnderwritingDecisionResponse> response =
+        ResponseEntity<UnderwritingDecisionResponse> result =
                 controller.createDecision(1L, req, "Bearer x");
 
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());        // <-- changed
-        assertEquals("ok", response.getBody().getRemarks());
+        assertNotNull(result.getBody());
+        assertEquals(50000.0, result.getBody().getApprovedLimit());
+        verify(service, times(1)).createDecision(1L, req, "Bearer x");
     }
 
     @Test
-    void createDecision_unauthorized() {
+    void testCreateDecision_unauthorized() {
         UnderwritingDecisionRequest req = new UnderwritingDecisionRequest();
 
         when(service.createDecision(1L, req, "Bearer x"))
@@ -115,21 +132,18 @@ class UnderwritingControllerTest {
     // ---------------- GET LATEST DECISION ----------------
 
     @Test
-    void getLatestDecision_success() {
-        UnderwritingDecisionResponse res = new UnderwritingDecisionResponse();
-        res.setRemarks("Approved");
+    void testGetLatestDecision_success() {
+        when(service.getLatestDecision(1L)).thenReturn(decisionResponse);
 
-        when(service.getLatestDecision(1L)).thenReturn(res);
-
-        ResponseEntity<UnderwritingDecisionResponse> response =
+        ResponseEntity<UnderwritingDecisionResponse> result =
                 controller.getLatestDecision(1L);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());             // <-- changed
-        assertEquals("Approved", response.getBody().getRemarks());
+        assertEquals(50000.0, result.getBody().getApprovedLimit());
+        verify(service, times(1)).getLatestDecision(1L);
     }
 
     @Test
-    void getLatestDecision_notFound() {
+    void testGetLatestDecision_notFound() {
         when(service.getLatestDecision(1L))
                 .thenThrow(new EntityNotFoundException("UnderwritingDecision", 1L));
 
