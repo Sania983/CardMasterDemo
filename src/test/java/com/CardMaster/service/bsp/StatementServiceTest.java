@@ -29,7 +29,7 @@ class StatementServiceTest {
         // Create a Statement entity stub
         statement = new Statement();
         statement.setStatementId(1L);
-        statement.setAccountId(account); // ✅ assign entity, not a long
+        statement.setAccountId(account); // assign entity, not a long
         statement.setPeriodStart(LocalDate.now().minusMonths(1));
         statement.setPeriodEnd(LocalDate.now());
         statement.setTotalDue(5000.0);
